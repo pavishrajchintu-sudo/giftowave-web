@@ -7,13 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
     <style>
         :root { --accent: #d4a373; --bg: #fdfaf7; --text: #1a1a1a; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; overflow-x: hidden; scroll-behavior: smooth; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; overflow-x: hidden; scroll-behavior: smooth; color: var(--text); }
 
         /* Sidebar Styling */
         .sidebar { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background-color: #fff; overflow-x: hidden; transition: 0.5s; box-shadow: 2px 0 15px rgba(0,0,0,0.1); padding-top: 20px; }
-        .sidebar a { padding: 15px 32px; text-decoration: none; font-size: 16px; color: #555; display: block; transition: 0.3s; border-bottom: 1px solid #f9f9f9; }
+        .sidebar a { padding: 15px 32px; text-decoration: none; font-size: 14px; color: #555; display: block; transition: 0.3s; border-bottom: 1px solid #f9f9f9; text-transform: uppercase; letter-spacing: 1px; }
         .sidebar a:hover { background: var(--bg); color: var(--accent); }
         .sidebar .closebtn { position: absolute; top: 10px; right: 25px; font-size: 30px; cursor: pointer; }
 
@@ -25,52 +27,54 @@
         #cart-count { position: absolute; top: -8px; right: -10px; background: var(--accent); color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
 
         /* Hero Section */
-        .hero { height: 70vh; background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=2000'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .hero-card { background: rgba(255,255,255,0.9); padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .hero h1 { font-family: 'Playfair Display', serif; font-size: 38px; margin: 0; }
+        .hero { height: 75vh; background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=2000'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero-card { background: rgba(255,255,255,0.95); padding: 50px; border-radius: 2px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 600px; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin: 0; }
 
         /* Product Cards */
-        .grid { display: flex; justify-content: center; gap: 40px; padding: 60px 5%; flex-wrap: wrap; }
-        .card { width: 300px; text-align: center; }
-        .card img { width: 100%; height: 400px; object-fit: cover; border-radius: 4px; transition: 0.5s; }
-        .card:hover img { transform: scale(1.02); }
-        .card h3 { font-family: 'Playfair Display', serif; margin: 20px 0 5px; font-size: 20px; }
-        .price { color: var(--accent); letter-spacing: 1px; margin-bottom: 15px; }
+        .section-title { text-align: center; font-family: 'Playfair Display', serif; font-size: 32px; margin-top: 80px; }
+        .grid { display: flex; justify-content: center; gap: 40px; padding: 40px 5% 80px; flex-wrap: wrap; }
+        .card { width: 320px; text-align: center; background: white; padding: 15px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .card img { width: 100%; height: 420px; object-fit: cover; border-radius: 2px; transition: 0.5s; }
+        .card:hover img { transform: scale(1.03); }
+        .card h3 { font-family: 'Playfair Display', serif; margin: 20px 0 5px; font-size: 22px; }
+        .price { color: var(--accent); letter-spacing: 1px; font-weight: 500; margin-bottom: 15px; }
+
+        /* Content Sections */
+        .info-section { padding: 80px 10%; background: #fff; line-height: 1.8; color: #444; }
+        .info-section h2 { font-family: 'Playfair Display', serif; color: #000; font-size: 28px; margin-bottom: 20px; }
 
         /* Elegant Buttons */
-        .btn-black { background: #000; color: #fff; border: none; padding: 12px 30px; cursor: pointer; font-size: 13px; letter-spacing: 2px; width: 100%; transition: 0.3s; }
-        .btn-black:hover { background: var(--accent); }
+        .btn-black { background: #000; color: #fff; border: none; padding: 14px 35px; cursor: pointer; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; width: 100%; }
+        .btn-black:hover { background: var(--accent); transform: translateY(-2px); }
 
         /* Modals */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #fff; padding: 40px; width: 90%; max-width: 450px; position: relative; border-radius: 8px; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 45px; width: 90%; max-width: 450px; position: relative; border-radius: 2px; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 0; font-family: 'Montserrat'; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div id="mySidebar" class="sidebar">
         <div style="padding: 20px 32px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
-            <p style="margin: 0; font-size: 12px; color: #999;">Welcome,</p>
-            <h4 id="user-display-name" style="margin: 5px 0 0; font-family: 'Playfair Display'; color: var(--text);">Guest Explorer</h4>
+            <p style="margin: 0; font-size: 11px; color: #999; letter-spacing: 1px; text-transform: uppercase;">Member</p>
+            <h4 id="user-display-name" style="margin: 5px 0 0; font-family: 'Playfair Display'; color: var(--text); font-size: 20px;">Guest Explorer</h4>
         </div>
         <span class="closebtn" onclick="toggleNav(0)">&times;</span>
-        <a href="#" onclick="toggleNav(0)"><i class="bi bi-house-door"></i> Home</a>
-        <a href="#"><i class="bi bi-person"></i> My Profile</a>
-        <a href="#"><i class="bi bi-bag-check"></i> My Orders</a>
-        <a href="https://www.delhivery.com/tracking" target="_blank"><i class="bi bi-truck"></i> Track Order</a>
-        <a href="#"><i class="bi bi-shield-check"></i> Privacy Policy</a>
-        <a href="https://wa.me/919740979918" target="_blank" style="color: #25d366;"><i class="bi bi-whatsapp"></i> Support</a>
-        <a href="/dashboard.html" style="background: #fdfaf7; margin-top: 50px; font-weight: bold;">FOUNDER LOGIN</a>
+        <a href="#home" onclick="toggleNav(0)"><i class="bi bi-house-door"></i> Home</a>
+        <a href="#about-section" onclick="toggleNav(0)"><i class="bi bi-journal-text"></i> Our Story</a>
+        <a href="#privacy-section" onclick="toggleNav(0)"><i class="bi bi-shield-check"></i> Privacy Policy</a>
+        <a href="https://wa.me/919740979918" target="_blank" style="color: #25d366;"><i class="bi bi-whatsapp"></i> Live Support</a>
     </div>
 
-    <nav>
+    <nav id="home">
         <div class="nav-left">
-            <i class="bi bi-list" style="font-size: 28px; cursor: pointer;" onclick="toggleNav(250)"></i>
+            <i class="bi bi-list" style="font-size: 28px; cursor: pointer;" onclick="toggleNav(280)"></i>
             <img src="logo.jpeg" alt="Giftowave" class="logo-img">
         </div>
         <div style="display: flex; align-items: center;">
-            <i class="bi bi-search" style="margin-right: 25px; font-size: 18px; cursor: pointer;"></i>
-            <div class="cart-icon-wrapper">
+            <div class="cart-icon-wrapper" onclick="scrollToGrid()">
                 <i class="bi bi-bag" style="font-size: 22px;"></i>
                 <span id="cart-count">0</span>
             </div>
@@ -80,53 +84,71 @@
     <div class="hero">
         <div class="hero-card">
             <h1>The Magazine Collection</h1>
-            <p style="letter-spacing: 2px; color: #888; margin-top: 10px;">PREMIUM PERSONALISED GIFTING</p>
-            <button class="btn-black" style="width: auto; margin-top: 20px;">DISCOVER MORE</button>
+            <p style="letter-spacing: 3px; color: #888; margin-top: 15px; font-size: 11px;">ELEVATED PERSONALISED KEEPSAKES</p>
+            <button class="btn-black" id="discover-btn" style="width: auto; margin-top: 25px;" onclick="scrollToGrid()">DISCOVER THE EDITIONS</button>
         </div>
     </div>
 
+    <h2 class="section-title" id="magazine-grid">Curated Editions</h2>
     <div class="grid">
         <div class="card">
             <img src="priyanka.jpeg" alt="Vogue Edition">
             <h3>The Vogue Edition</h3>
             <p class="price">Rs. 999.00</p>
-            <button class="btn-black" onclick="openCheckout('The Vogue Edition')">ADD TO CART</button>
+            <button class="btn-black" onclick="openCheckout('The Vogue Edition', 999)">ADD TO CART</button>
         </div>
         <div class="card">
             <img src="friends.jpeg" alt="Friends Edition">
             <h3>The F.R.I.E.N.D.S Issue</h3>
             <p class="price">Rs. 1,299.00</p>
-            <button class="btn-black" onclick="openCheckout('The F.R.I.E.N.D.S Issue')">ADD TO CART</button>
+            <button class="btn-black" onclick="openCheckout('The F.R.I.E.N.D.S Issue', 1299)">ADD TO CART</button>
         </div>
+    </div>
+
+    <div class="info-section" id="about-section">
+        <h2>About Giftowave</h2>
+        <p>Giftowave is a premium gifting studio born at IIT Kharagpur, built on the philosophy that every memory deserves a spotlight. We craft bespoke, high-fashion magazines where your personal milestones become cover stories. From our signature 'Vogue Edition' to nostalgia-infused 'F.R.I.E.N.D.S' issues, we combine minimalist design with luxury materials to deliver a gift that feels as exclusive as a high-end publication.</p>
+    </div>
+
+    <div class="info-section" id="privacy-section" style="background: #f9f9f9;">
+        <h2>Privacy & Safety</h2>
+        <p>At Giftowave, your media is sacred. Your photographs and details are used strictly for the custom design process. We utilise secure cloud infrastructure and never share your data with external parties. Once your premium magazine is delivered, your data is securely archived. For payments, we use Razorpay—India's leading secure payment gateway—ensuring your financial transactions are encrypted and private.</p>
     </div>
 
     <div id="checkoutModal" class="overlay">
         <div class="modal-content">
-            <h2 style="font-family: 'Playfair Display'; text-align: center;" id="modal-product-name">Shipping Details</h2>
-            <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 20px;">Enter your details to proceed to secure payment.</p>
-            <input type="text" id="custName" placeholder="Full Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:4px;">
-            <input type="email" id="custEmail" placeholder="Email Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:4px;">
-            <input type="text" id="custPhone" placeholder="Mobile Number" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:4px;">
-            <textarea id="custAddress" placeholder="Full Delivery Address" rows="3" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; font-family: inherit;"></textarea>
+            <h2 style="font-family: 'Playfair Display'; text-align: center; margin-top: 0;" id="modal-product-name">Shipping Details</h2>
+            <p style="font-size: 11px; color: #888; text-align: center; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;">Secure Checkout</p>
             
-            <button class="btn-black" onclick="triggerRazorpay()">PROCEED TO PAY</button>
-            <p style="text-align:center; cursor:pointer; margin-top:15px; font-size:13px; color:#999;" onclick="closeCheckout()">Go Back</p>
+            <input type="text" id="custName" placeholder="Full Name">
+            <input type="email" id="custEmail" placeholder="Email Address">
+            <input type="text" id="custPhone" placeholder="Mobile Number">
+            <textarea id="custAddress" placeholder="Full Delivery Address (incl. Pincode)" rows="3" style="font-family: inherit;"></textarea>
+            
+            <button class="btn-black" onclick="triggerRazorpay()">PROCEED TO SECURE PAY</button>
+            <p style="text-align:center; cursor:pointer; margin-top:15px; font-size:12px; color:#999; text-transform: uppercase; letter-spacing: 1px;" onclick="closeCheckout()">Cancel Order</p>
         </div>
     </div>
 
     <script>
         let selectedProduct = "";
+        let selectedPrice = 0;
         let cartCount = 0;
 
         function toggleNav(width) {
             document.getElementById("mySidebar").style.width = width + "px";
         }
 
-        function openCheckout(productName) {
+        function scrollToGrid() {
+            document.getElementById('magazine-grid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openCheckout(productName, price) {
             selectedProduct = productName;
+            selectedPrice = price;
             cartCount++;
             document.getElementById('cart-count').innerText = cartCount;
-            document.getElementById('modal-product-name').innerText = "Order: " + productName;
+            document.getElementById('modal-product-name').innerText = productName;
             document.getElementById("checkoutModal").style.display = "flex";
         }
 
@@ -144,11 +166,11 @@
             };
 
             if (!orderData.customerName || !orderData.address || !orderData.phone) {
-                return alert("Please fill in all shipping details.");
+                return alert("Please provide full name, mobile, and delivery address.");
             }
 
             try {
-                // Send data to Backend (MongoDB Atlas)
+                // Keep the existing Backend Connection
                 const response = await fetch('/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -156,22 +178,37 @@
                 });
 
                 if (response.ok) {
-                    // Update Sidebar Profile Name
                     document.getElementById('user-display-name').innerText = orderData.customerName;
-                    
-                    alert("Order logged successfully! Redirecting to secure payment...");
-                    
-                    // WhatsApp Redirect logic
-                    const whatsappMsg = `Hi Giftowave! I am ${orderData.customerName}. I just completed my payment for the ${selectedProduct}. Here are my photos.`;
-                    window.open(`https://wa.me/919740979918?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
-                    
-                    closeCheckout();
+
+                    // Trigger Razorpay Modal
+                    const options = {
+                        "key": "rzp_test_YOUR_KEY_HERE", // REPLACE THIS with your Razorpay Key ID
+                        "amount": selectedPrice * 100, 
+                        "currency": "INR",
+                        "name": "Giftowave Studio",
+                        "description": `Order for ${selectedProduct}`,
+                        "image": "logo.jpeg",
+                        "handler": function (response) {
+                            const whatsappMsg = `Hi Giftowave! Order confirmed.\n\nName: ${orderData.customerName}\nProduct: ${selectedProduct}\nPayment ID: ${response.razorpay_payment_id}\n\nUploading photos now!`;
+                            window.open(`https://wa.me/919740979918?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
+                            closeCheckout();
+                            alert("Payment Successful! We are redirecting you to WhatsApp to receive your photos.");
+                        },
+                        "prefill": {
+                            "name": orderData.customerName,
+                            "email": orderData.email,
+                            "contact": orderData.phone
+                        },
+                        "theme": { "color": "#d4a373" }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
                 } else {
-                    alert("Something went wrong with the database connection.");
+                    alert("Order logging failed. Please check backend connection.");
                 }
             } catch (error) {
-                console.error("Error:", error);
-                alert("Server Error: Make sure your node server is running!");
+                alert("Connection Error: Make sure your Render server is live.");
             }
         }
     </script>
