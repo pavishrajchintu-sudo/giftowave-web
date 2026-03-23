@@ -50,9 +50,9 @@
         </div>
         <div class="sidebar-links">
             <a href="#home" onclick="toggleSidebar(false)"><i class="bi bi-house"></i> Home</a>
-            <a onclick="openLoginModal()"><i class="bi bi-person"></i> <span id="auth-link-text">Sign In / Profile</span></a>
-            <a href="/dashboard.html"><i class="bi bi-bag-check"></i> Your Orders</a>
-            <a id="founder-link" href="/founder-dashboard.html" style="display:none; color: var(--accent); font-weight: bold;"><i class="bi bi-shield-lock"></i> Founder Panel</a>
+            <a onclick="handleProfileClick()"><i class="bi bi-person"></i> <span id="auth-link-text">Sign In / Profile</span></a>
+            <a href="dashboard.html"><i class="bi bi-bag-check"></i> Your Orders</a>
+            <a id="founder-link" href="founder-dashboard.html" style="display:none; color: var(--accent); font-weight: bold;"><i class="bi bi-shield-lock"></i> Founder Panel</a>
             <a href="https://www.delhivery.com/tracking" target="_blank"><i class="bi bi-truck"></i> Live Tracking</a>
             <a href="https://wa.me/919480119825" target="_blank"><i class="bi bi-whatsapp"></i> Support</a>
             <a id="logout-btn" style="display:none; color:red;" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
@@ -127,18 +127,6 @@
         </div>
     </div>
 
-    <div id="about" class="reveal" style="padding: 100px 10%; text-align: center;">
-        <h2 style="font-family:'Playfair Display'; font-size:36px;">The Philosophy</h2>
-        <p style="max-width: 700px; margin: 20px auto; line-height: 1.8; color: #555;">Giftowave transforms digital milestones into luxury editorial print. We believe your best moments deserve to be held, not just scrolled.</p>
-    </div>
-
-    <div id="policies" class="reveal" style="padding: 100px 10%; background: #fdfaf7;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; font-size: 13px;">
-            <div><h4>Privacy</h4><p>Photos are purged from our servers 30 days post-delivery.</p></div>
-            <div><h4>Support</h4><p>For payment or shipping queries, WhatsApp us at +91 9480119825.</p></div>
-        </div>
-    </div>
-
     <script>
         let cart = [];
         
@@ -150,6 +138,16 @@
                 updateUIForLoggedInUser(user);
             }
         };
+
+        // NEW: Smart Profile Handling
+        function handleProfileClick() {
+            const token = localStorage.getItem('gt_token');
+            if (token) {
+                window.location.href = 'dashboard.html';
+            } else {
+                openLoginModal();
+            }
+        }
 
         function handleCredentialResponse(response) {
             fetch('/api/auth/google', {
@@ -179,12 +177,15 @@
             window.location.reload();
         }
 
-        function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+        function openLoginModal() { 
+            toggleSidebar(false); // Close sidebar first
+            document.getElementById('loginModal').style.display = 'flex'; 
+        }
         function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
         function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
         function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
-        // --- 2. ORDER LOGIC (SECURE) ---
+        // ... (Remaining Logic for Cart and Interactivity) ...
         async function processPayment() {
             const token = localStorage.getItem('gt_token');
             if(!token) return openLoginModal(); 
@@ -212,7 +213,6 @@
             }
         }
 
-        // --- 3. UI INTERACTIVE ---
         const observer = new IntersectionObserver((e) => e.forEach(en => en.isIntersecting && en.target.classList.add('active')), {threshold: 0.1});
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         function toggleSidebar(o) { const s = document.getElementById("mySidebar"); s.style.width = o ? "300px" : "0"; s.classList.toggle("active", o); }
