@@ -55,7 +55,7 @@ app.post('/api/auth/google', async (req, res) => {
     try {
         const ticket = await client.verifyIdToken({
             idToken,
-            audience: process.env.GOOGLE_CLIENT_ID
+            audience: process.env.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
         
@@ -79,6 +79,7 @@ app.post('/api/auth/google', async (req, res) => {
 
         res.json({ success: true, token: sessionToken, user });
     } catch (error) {
+        console.error("❌ Google Auth Error Details:", error);
         res.status(401).json({ error: "Authentication Failed" });
     }
 });
