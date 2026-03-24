@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        /* ... (Your existing CSS) ... */
         :root { --accent: #d4a373; --bg: #fdfaf7; --text: #1a1a1a; --glass: rgba(255, 255, 255, 0.8); }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; overflow-x: hidden; scroll-behavior: smooth; color: var(--text); }
         nav { background: var(--glass); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top:0; z-index: 100; }
@@ -38,174 +37,156 @@
 </head>
 <body>
 
+    <div id="mySidebar" class="sidebar">
+        <span style="position:absolute; top:30px; right:25px; cursor:pointer; font-size:24px;" onclick="toggleSidebar(false)"><i class="bi bi-x-lg"></i></span>
+        <div style="padding: 100px 32px 20px 32px; border-bottom: 1px solid #f0f0f0;">
+            <h4 id="user-name" style="margin:0; font-family:'Playfair Display'; font-size:24px;">Guest Explorer</h4>
+            <p id="user-status" style="font-size:10px; color:#aaa; letter-spacing:1px; margin-top:5px; text-transform:uppercase;">Sign in via Profile</p>
+        </div>
+        <div class="sidebar-links">
+            <a href="#home" onclick="toggleSidebar(false)"><i class="bi bi-house"></i> Home</a>
+            <a onclick="handleProfileClick()"><i class="bi bi-person"></i> <span id="auth-link-text">Sign In / Profile</span></a>
+            <a href="dashboard.html"><i class="bi bi-bag-check"></i> Your Orders</a>
+            <a id="founder-link" href="founder-dashboard.html" style="display:none; color: var(--accent); font-weight: bold;"><i class="bi bi-shield-lock"></i> Founder Panel</a>
+            <a href="https://wa.me/919480119825" target="_blank"><i class="bi bi-whatsapp"></i> Support</a>
+            <a id="logout-btn" style="display:none; color:red;" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+    </div>
+
+    <div id="loginModal" class="overlay">
+        <div class="modal-content">
+            <h2 style="font-family:'Playfair Display'">Giftowave Identity</h2>
+            <div id="g_id_onload" data-client_id="191068266437-c5pfe4s011l2k3jhdpfadih3ndan1sfv.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
+            <div class="g_id_signin" data-type="standard"></div>
+            <p style="margin-top:20px; font-size:11px; cursor:pointer;" onclick="closeLoginModal()">Continue as Guest</p>
+        </div>
+    </div>
+
+    <div id="checkoutModal" class="overlay">
+        <div class="modal-content">
+            <h2 style="font-family:'Playfair Display'">Shipping</h2>
+            <input type="text" id="custName" placeholder="Full Name">
+            <input type="text" id="custPhone" placeholder="WhatsApp Number">
+            <textarea id="custAddress" placeholder="Full Address" rows="3"></textarea>
+            <button class="btn-black" onclick="processPayment()">Confirm & Pay</button>
+            <p style="cursor:pointer; font-size:11px; color:#aaa;" onclick="closeCheckoutModal()">CANCEL</p>
+        </div>
+    </div>
+
+    <nav id="home">
+        <div style="display:flex; align-items:center; gap:30px;">
+            <i class="bi bi-list" style="font-size: 24px; cursor: pointer;" onclick="toggleSidebar(true)"></i>
+            <img src="logo.jpeg" alt="Giftowave" class="logo-img">
+        </div>
+        <div onclick="toggleCart(true)" style="background:#000; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">
+            <span id="cart-count">0</span> <i class="bi bi-bag"></i>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-card" id="parallax-card">
+            <h1 style="font-family:'Playfair Display'; font-size:50px;">Handcrafted <br> Memories</h1>
+            <button class="btn-black" style="width:auto;" onclick="scrollToProducts()">EXPLORE</button>
+        </div>
+    </div>
+
+    <div class="grid" id="product-grid">
+        <div class="card reveal">
+            <img src="priyanka.jpeg" alt="Vogue">
+            <h3>The Vogue Edition</h3>
+            <p>999 INR</p>
+            <button class="btn-black" onclick="addToCart('The Vogue Edition', 999)">Add to Cart</button>
+        </div>
+    </div>
+
+    <div id="sideCart" class="side-cart">
+        <div style="padding:40px;">
+            <h2 style="font-family:'Playfair Display'">Boutique Cart</h2>
+            <div id="cart-items-list"></div>
+            <div id="cart-summary" style="display:none;">
+                <p>SUBTOTAL: <span id="cart-total-price">0</span> INR</p>
+                <button class="btn-black" onclick="openCheckoutModal()">Secure Checkout</button>
+            </div>
+            <p onclick="toggleCart(false)" style="cursor:pointer; margin-top:20px;">Close Cart</p>
+        </div>
+    </div>
+
     <script>
         let cart = [];
-        
-        // --- 1. SESSION MANAGEMENT (Same as your file) ---
-        window.onload = function() {
+        window.onload = () => {
             const token = localStorage.getItem('gt_token');
             const user = JSON.parse(localStorage.getItem('gt_user'));
-            if(token && user) {
-                updateUIForLoggedInUser(user);
-            }
+            if(token && user) updateUIForLoggedInUser(user);
         };
 
-        function handleProfileClick() {
-            const token = localStorage.getItem('gt_token');
-            if (token) {
-                window.location.href = 'dashboard.html';
-            } else {
-                openLoginModal();
+        function updateUIForLoggedInUser(user) {
+            const nameEl = document.getElementById('user-name');
+            if(nameEl) nameEl.innerText = user.name;
+            const statusEl = document.getElementById('user-status');
+            if(statusEl) statusEl.innerText = "Premium Member";
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) logoutBtn.style.display = "flex";
+            if(user.isAdmin) {
+                const founderLink = document.getElementById('founder-link');
+                if(founderLink) founderLink.style.display = "flex";
             }
         }
 
-        function handleCredentialResponse(response) {
-            fetch('/api/auth/google', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ idToken: response.credential })
-            })
-            .then(res => res.json())
-            .then(data => {
-                localStorage.setItem('gt_token', data.token);
-                localStorage.setItem('gt_user', JSON.stringify(data.user));
-                updateUIForLoggedInUser(data.user);
-                closeLoginModal();
-            });
-        }
-
-        function updateUIForLoggedInUser(user) {
-            document.getElementById('user-name').innerText = user.name;
-            document.getElementById('user-status').innerText = "Premium Member";
-            document.getElementById('auth-link-text').innerText = "Your Profile";
-            document.getElementById('logout-btn').style.display = "flex";
-            if(user.isAdmin) document.getElementById('founder-link').style.display = "flex";
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.reload();
-        }
-
-        function openLoginModal() { 
-            toggleSidebar(false);
-            document.getElementById('loginModal').style.display = 'flex'; 
-        }
-        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
-        function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
-        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
-
-        // --- 2. UPDATED SECURE RAZORPAY PAYMENT LOGIC ---
         async function processPayment() {
             const token = localStorage.getItem('gt_token');
-            if(!token) return openLoginModal(); 
+            if(!token) return openLoginModal();
+            const total = cart.reduce((s,i)=>s+i.p, 0);
+            
+            const res = await fetch('/api/create-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify({amount: total})
+            });
+            const orderData = await res.json();
 
-            const totalAmount = cart.reduce((s, i) => s + i.p, 0);
-            const address = document.getElementById('custAddress').value;
-
-            if(!address) return alert("Please provide a shipping address.");
-
-            try {
-                // Step A: Create Order on your Backend
-                const orderRes = await fetch('/api/create-order', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${token}` 
-                    },
-                    body: JSON.stringify({ amount: totalAmount })
-                });
-                const orderData = await orderRes.json();
-
-                if(!orderData.id) throw new Error("Order creation failed");
-
-                // Step B: Configure Razorpay Checkout
-                const options = {
-                    "key": "rzp_test_SV5QxCbNRxErQt", // PASTE YOUR TEST KEY ID HERE
-                    "amount": orderData.amount,
-                    "currency": "INR",
-                    "name": "Giftowave Studio",
-                    "description": "Custom Magazine Order",
-                    "image": "logo.jpeg",
-                    "order_id": orderData.id, 
-                    "handler": async function (response) {
-                        // This code runs when payment is successful
-                        const saveRes = await fetch('/api/orders', {
-                            method: 'POST',
-                            headers: { 
-                                'Content-Type': 'application/json', 
-                                'Authorization': `Bearer ${token}` 
-                            },
-                            body: JSON.stringify({
-                                product: cart.map(i=>i.n).join(", "),
-                                amount: totalAmount,
-                                address: address,
-                                paymentId: response.razorpay_payment_id,
-                                razorpayOrderId: response.razorpay_order_id
-                            })
-                        });
-
-                        if(saveRes.ok) {
-                            alert("Payment Successful! Your memories are being curated.");
-                            closeCheckoutModal();
-                            cart = [];
-                            updateCartUI();
-                            
-                            // Redirect to WhatsApp for photos
-                            const msg = encodeURIComponent(`Hi! I just placed an order on Giftowave. Payment ID: ${response.razorpay_payment_id}. Here are my details...`);
-                            window.location.href = `https://wa.me/919480119825?text=${msg}`;
-                        }
-                    },
-                    "prefill": {
-                        "name": document.getElementById('custName').value,
-                        "contact": document.getElementById('custPhone').value
-                    },
-                    "theme": { "color": "#d4a373" }
-                };
-
-                const rzp1 = new Razorpay(options);
-                rzp1.open();
-
-            } catch (err) {
-                console.error("Payment Error:", err);
-                alert("Something went wrong with the payment gateway.");
-            }
+            const options = {
+                "key": "rzp_test_SV5QxCbNRxErQt",
+                "amount": orderData.amount,
+                "currency": "INR",
+                "name": "Giftowave Studio",
+                "order_id": orderData.id,
+                "handler": async function (response) {
+                    await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                        body: JSON.stringify({
+                            product: cart.map(i=>i.n).join(", "),
+                            amount: total,
+                            address: document.getElementById('custAddress').value,
+                            paymentId: response.razorpay_payment_id
+                        })
+                    });
+                    alert("Order Placed!");
+                    window.location.href = `https://wa.me/919480119825?text=OrderID:${response.razorpay_payment_id}`;
+                }
+            };
+            new Razorpay(options).open();
         }
 
-        // --- 3. UI INTERACTIVE (Same as your file) ---
-        // ... (toggleSidebar, addToCart, updateCartUI, etc.) ...
-        const observer = new IntersectionObserver((e) => e.forEach(en => en.isIntersecting && en.target.classList.add('active')), {threshold: 0.1});
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        function toggleSidebar(o) { const s = document.getElementById("mySidebar"); s.style.width = o ? "300px" : "0"; s.classList.toggle("active", o); }
-        function toggleCart(o) { document.getElementById("sideCart").className = o ? "side-cart active" : "side-cart"; }
+        // Sidebar/Cart Helpers
+        function toggleSidebar(o) { const s = document.getElementById("mySidebar"); if(s) { s.style.width = o ? "300px" : "0"; s.classList.toggle("active", o); } }
+        function toggleCart(o) { const c = document.getElementById("sideCart"); if(c) c.className = o ? "side-cart active" : "side-cart"; }
         function addToCart(n, p) { cart.push({n, p}); updateCartUI(); toggleCart(true); }
-        
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
             const list = document.getElementById('cart-items-list');
             const summary = document.getElementById('cart-summary');
-            if (cart.length === 0) {
-                list.innerHTML = '<p style="color:#999; font-size:12px;">EMPTY SELECTION...</p>';
-                summary.style.display = "none";
-            } else {
-                list.innerHTML = cart.map((i, idx) => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:12px;">
-                        <span>${i.n}</span>
-                        <span>${i.p} <i class="bi bi-x" style="cursor:pointer" onclick="removeItem(${idx})"></i></span>
-                    </div>`).join('');
-                document.getElementById('cart-total-price').innerText = cart.reduce((s, i) => s + i.p, 0);
-                summary.style.display = "block";
-            }
+            list.innerHTML = cart.map(i => `<p>${i.n} - ${i.p} INR</p>`).join('');
+            document.getElementById('cart-total-price').innerText = cart.reduce((s,i)=>s+i.p,0);
+            summary.style.display = cart.length > 0 ? "block" : "none";
         }
-        function removeItem(idx) { cart.splice(idx, 1); updateCartUI(); }
-        function scrollToProducts() { document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth' }); }
-
-        document.addEventListener('mousemove', (e) => {
-            const card = document.getElementById('parallax-card');
-            const x = (window.innerWidth / 2 - e.pageX) / 30;
-            const y = (window.innerHeight / 2 - e.pageY) / 30;
-            if(card) card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-        });
+        function openLoginModal() { toggleSidebar(false); document.getElementById('loginModal').style.display = 'flex'; }
+        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+        function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
+        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
+        function handleProfileClick() { if(localStorage.getItem('gt_token')) window.location.href = 'dashboard.html'; else openLoginModal(); }
+        function logout() { localStorage.clear(); window.location.reload(); }
+        function scrollToProducts() { document.getElementById('product-grid').scrollIntoView({behavior:'smooth'}); }
     </script>
 </body>
 </html>
