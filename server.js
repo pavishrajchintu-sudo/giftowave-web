@@ -8,7 +8,7 @@ const Razorpay = require('razorpay');
 const app = express();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Initialize Razorpay
+// --- Razorpay Setup ---
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -17,11 +17,12 @@ const razorpay = new Razorpay({
 app.use(express.json());
 app.use(express.static('public'));
 
+// --- Database Connection ---
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ Giftowave DB Connected"))
-    .catch(err => console.error("❌ DB Error:", err));
+    .catch(err => console.error("❌ DB Error Details:", err));
 
-// --- Schemas ---
+// --- Database Schemas ---
 const userSchema = new mongoose.Schema({
     googleId: String,
     name: String,
@@ -37,30 +38,40 @@ const orderSchema = new mongoose.Schema({
     address: String,
     amount: Number,
     paymentId: String,
-    razorpayOrderId: String,
     status: { type: String, default: 'Paid' },
     date: { type: Date, default: Date.now }
 });
 const Order = mongoose.model('Order', orderSchema);
 
-// --- Middleware ---
+// --- Middleware: Auth Verification ---
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Access Denied" });
+    if (!authHeader) {
+        console.error("❌ Auth Error: No header found");
+        return res.status(401).json({ error: "Access Denied: No Token Provided" });
+    }
+
     const token = authHeader.split(' ')[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(403).json({ error: "Session Expired" });
+        if (err) {
+            console.error("❌ JWT Error:", err.message);
+            return res.status(403).json({ error: "Session Expired. Please login again." });
+        }
         req.user = decoded;
         next();
     });
 };
 
-// --- Routes ---
+// --- AUTH: Google Login ---
 app.post('/api/auth/google', async (req, res) => {
     const { idToken } = req.body;
     try {
-        const ticket = await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT_ID });
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
         const payload = ticket.getPayload();
+        
         let user = await User.findOne({ email: payload.email });
         if (!user) {
             user = new User({
@@ -71,41 +82,91 @@ app.post('/api/auth/google', async (req, res) => {
                 isAdmin: payload.email === "pavishrajchintu@gmail.com"
             });
             await user.save();
+            console.log("👤 New User Created:", user.email);
         }
-        const sessionToken = jwt.sign({ userId: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        const sessionToken = jwt.sign(
+            { userId: user._id, isAdmin: user.isAdmin },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
         res.json({ success: true, token: sessionToken, user });
     } catch (error) {
-        res.status(401).json({ error: "Authentication Failed" });
+        console.error("❌ Google Auth Failure:", error);
+        res.status(401).json({ error: "Authentication Failed at Google level" });
     }
 });
 
+// --- PAYMENT: Razorpay Order Creation ---
 app.post('/api/create-order', authenticateToken, async (req, res) => {
+    const { amount } = req.body;
     try {
-        const order = await razorpay.orders.create({
-            amount: req.body.amount * 100,
+        const options = {
+            amount: amount * 100, // Amount in paise
             currency: "INR",
-            receipt: `rcpt_${Date.now()}`
-        });
+            receipt: `gift_rcpt_${Date.now()}`,
+        };
+        const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("❌ Razorpay Order creation failed:", err);
+        res.status(500).json({ error: "Could not initialize Payment Gateway" });
     }
 });
+
+// --- USER ROUTES ---
 
 app.post('/api/orders', authenticateToken, async (req, res) => {
     try {
-        const newOrder = new Order({ ...req.body, userId: req.user.userId });
+        const newOrder = new Order({
+            ...req.body,
+            userId: req.user.userId
+        });
         await newOrder.save();
-        res.status(201).json({ success: true });
+        res.status(201).json({ success: true, message: "Order saved to vault" });
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        console.error("❌ Order Save Error:", err.message);
+        res.status(400).json({ error: "Failed to save order details" });
     }
 });
 
 app.get('/api/user/orders', authenticateToken, async (req, res) => {
-    const orders = await Order.find({ userId: req.user.userId }).sort({ date: -1 });
-    res.json(orders);
+    try {
+        const orders = await Order.find({ userId: req.user.userId }).sort({ date: -1 });
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to retrieve your order history" });
+    }
+});
+
+// --- ADMIN ROUTES (Founder Dashboard) ---
+
+app.get('/api/admin/all-orders', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+    
+    try {
+        const orders = await Order.find()
+            .populate('userId', 'name email')
+            .sort({ date: -1 });
+        res.json(orders);
+    } catch (err) {
+        console.error("❌ Admin Fetch Error:", err);
+        res.status(500).json({ error: "Founder dashboard sync failed" });
+    }
+});
+
+app.put('/api/admin/order/:id/ship', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+    
+    try {
+        const updated = await Order.findByIdAndUpdate(req.params.id, { status: 'Shipped' });
+        if (!updated) return res.status(404).json({ error: "Order not found" });
+        res.json({ success: true, message: "Order marked as shipped" });
+    } catch (err) {
+        res.status(400).json({ error: "Update failed" });
+    }
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Giftowave Server live on port ${PORT}`));
