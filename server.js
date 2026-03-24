@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const Razorpay = require('razorpay');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -176,7 +177,7 @@ app.post('/api/ask-giftowave-agent', async (req, res) => {
         const userMessage = req.body.message;
 
         // 2. Send that message over to your new Python AI server!
-        const aiResponse = await fetch('https://giftowave-ai-agent.onrender.com', {
+        const aiResponse = await fetch('https://giftowave-ai-agent.onrender.com/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: userMessage })
