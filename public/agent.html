@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giftowave AI Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding: 50px; }
+        .chat-container { width: 100%; max-width: 500px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .chat-header { background: #2c3e50; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .chat-box { height: 400px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 15px; border-radius: 20px; max-width: 80%; line-height: 1.4; }
+        .user-msg { background: #3498db; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-msg { background: #ecf0f1; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; background: #fff; }
+        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        button { background: #2c3e50; color: white; border: none; padding: 10px 20px; margin-left: 10px; border-radius: 20px; cursor: pointer; }
+        button:hover { background: #1a252f; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">Giftowave Creative Assistant</div>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="message ai-msg">Hi! I am your Giftowave assistant. Ask me anything about our personalized magazines or pricing!</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatBox = document.getElementById("chatBox");
+            const userText = inputField.value.trim();
+
+            if (!userText) return; // Don't send empty messages
+
+            // 1. Show the user's message on the screen
+            chatBox.innerHTML += `<div class="message user-msg">${userText}</div>`;
+            inputField.value = ""; // Clear the input box
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+
+            // Show a temporary "typing..." message
+            const typingId = "typing-" + Date.now();
+            chatBox.innerHTML += `<div class="message ai-msg" id="${typingId}">Thinking...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // 2. Send the message to your Node.js backend
+                const response = await fetch('/api/ask-giftowave-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText })
+                });
+
+                const data = await response.json();
+
+                // 3. Remove "Thinking..." and show the real AI response
+                document.getElementById(typingId).remove();
+                
+                if(data.reply) {
+                    chatBox.innerHTML += `<div class="message ai-msg">${data.reply}</div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="message ai-msg" style="color:red;">Error: AI is offline.</div>`;
+                }
+
+            } catch (error) {
+                document.getElementById(typingId).remove();
+                chatBox.innerHTML += `<div class="message ai-msg" style="color:red;">Could not connect to server.</div>`;
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Allow pressing "Enter" to send
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>

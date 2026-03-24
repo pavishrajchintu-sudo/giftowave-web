@@ -48,6 +48,19 @@
         .modal-content { background: #fff; padding: 50px; width: 90%; max-width: 450px; text-align: center;}
         .btn-black { background: #000; color: #fff; border: none; padding: 16px 30px; cursor: pointer; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; width: 100%; margin-top: 15px; transition: 0.3s; }
         input, textarea { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #eee; font-family: 'Montserrat'; outline: none; box-sizing: border-box; }
+
+        /* --- NEW AI WIDGET CSS --- */
+        #chat-widget-btn { position: fixed; bottom: 20px; right: 20px; background-color: #000; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; }
+        #chat-widget-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; flex-direction: column; overflow: hidden; }
+        .widget-header { background: #000; color: white; padding: 15px; text-align: center; font-weight: bold; display: flex; justify-content: space-between;}
+        .close-btn { cursor: pointer; color: white; border: none; background: none; font-size: 16px; }
+        .widget-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
+        .widget-input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
+        .widget-input-area input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0; }
+        .widget-input-area button { background: #000; color: white; border: none; padding: 8px 15px; margin-left: 5px; cursor: pointer; border-radius: 4px; width: auto;}
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 14px; }
+        .msg.user { background: var(--accent); color: white; align-self: flex-end; }
+        .msg.ai { background: #e0e0e0; color: #333; align-self: flex-start; }
     </style>
 </head>
 <body>
@@ -131,6 +144,21 @@
             <textarea id="custAddress" placeholder="Full Address" rows="3"></textarea>
             <button class="btn-black" onclick="processPayment()">Confirm & Pay</button>
             <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:20px;" onclick="closeCheckoutModal()">CANCEL</p>
+        </div>
+    </div>
+
+    <button id="chat-widget-btn" onclick="toggleChat()">💬</button>
+    <div id="chat-widget-window">
+        <div class="widget-header">
+            <span style="font-family:'Playfair Display'">Giftowave Assistant</span>
+            <button class="close-btn" onclick="toggleChat()">✖</button>
+        </div>
+        <div class="widget-body" id="widgetChatBox">
+            <div class="msg ai">Hi! Need help with your custom magazine?</div>
+        </div>
+        <div class="widget-input-area">
+            <input type="text" id="widgetInput" placeholder="Type a message..." onkeypress="handleWidgetEnter(event)">
+            <button onclick="sendWidgetMessage()">Send</button>
         </div>
     </div>
 
@@ -275,6 +303,57 @@
 
         const observer = new IntersectionObserver((e) => e.forEach(en => en.isIntersecting && en.target.classList.add('active')), {threshold: 0.1});
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- NEW AI WIDGET LOGIC ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-widget-window');
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        async function sendWidgetMessage() {
+            const input = document.getElementById('widgetInput');
+            const chatBox = document.getElementById('widgetChatBox');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // Add User Message
+            chatBox.innerHTML += `<div class="msg user">${text}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Add Loading text
+            const tempId = "loading-" + Date.now();
+            chatBox.innerHTML += `<div class="msg ai" id="${tempId}">Thinking...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // Call the Node route we built earlier
+                const response = await fetch('/api/ask-giftowave-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+                document.getElementById(tempId).remove(); // Remove loading text
+
+                if (data.reply) {
+                    chatBox.innerHTML += `<div class="msg ai">${data.reply}</div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="msg ai" style="color:red;">Error connecting.</div>`;
+                }
+            } catch (error) {
+                document.getElementById(tempId).remove();
+                chatBox.innerHTML += `<div class="msg ai" style="color:red;">Server offline.</div>`;
+            }
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleWidgetEnter(event) {
+            if (event.key === 'Enter') sendWidgetMessage();
+        }
     </script>
 </body>
 </html>

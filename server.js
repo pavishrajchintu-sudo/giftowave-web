@@ -168,5 +168,32 @@ app.put('/api/admin/order/:id/ship', authenticateToken, async (req, res) => {
     }
 });
 
+
+// --- AI AGENT ROUTE ---
+app.post('/api/ask-giftowave-agent', async (req, res) => {
+    try {
+        // 1. Get the message the user typed on the React frontend
+        const userMessage = req.body.message;
+
+        // 2. Send that message over to your new Python AI server!
+        const aiResponse = await fetch('http://127.0.0.1:8000/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage })
+        });
+
+        // 3. Get the AI's answer
+        const aiData = await aiResponse.json();
+
+        // 4. Send the AI's answer back to your React frontend
+        res.json({ reply: aiData.reply });
+
+    } catch (error) {
+        console.error("Error talking to Python Agent:", error);
+        res.status(500).json({ error: "Agent is offline" });
+    }
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Giftowave Server live on port ${PORT}`));
