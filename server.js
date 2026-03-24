@@ -176,7 +176,7 @@ app.post('/api/ask-giftowave-agent', async (req, res) => {
         const userMessage = req.body.message;
 
         // 2. Send that message over to your new Python AI server!
-        const aiResponse = await fetch('http://127.0.0.1:8000/api/chat', {
+        const aiResponse = await fetch('https://giftowave-ai-agent.onrender.com', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: userMessage })
