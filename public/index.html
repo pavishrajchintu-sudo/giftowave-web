@@ -1,359 +1,364 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giftowave | Boutique Studio</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpeg">
-    
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <style>
-        :root { --accent: #d4a373; --bg: #fdfaf7; --text: #1a1a1a; --glass: rgba(255, 255, 255, 0.8); }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; overflow-x: hidden; scroll-behavior: smooth; color: var(--text); }
-        
-        /* Navigation */
-        nav { background: var(--glass); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top:0; z-index: 100; }
-        .logo-img { height: 40px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giftowave | Boutique Studio</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root { --accent: #d4a373; --bg: #fdfaf7; --text: #1a1a1a; --glass: rgba(255, 255, 255, 0.8); }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; overflow-x: hidden; scroll-behavior: smooth; color: var(--text); }
+        
+        /* Navigation */
+        nav { background: var(--glass); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top:0; z-index: 100; }
+        .logo-img { height: 40px; }
 
-        /* Sidebar Styling */
-        .sidebar { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background-color: #fff; transition: 0.5s; visibility: hidden; overflow-y: auto; box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
-        .sidebar.active { width: 300px; visibility: visible; }
-        .sidebar-links a { padding: 15px 32px; text-decoration: none; font-size: 14px; color: #444; display: flex; align-items: center; gap: 15px; transition: 0.3s; border-left: 3px solid transparent; cursor: pointer; }
-        .sidebar-links a:hover { background: #f9f9f9; color: var(--accent); border-left: 3px solid var(--accent); }
+        /* Sidebar Styling */
+        .sidebar { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background-color: #fff; transition: 0.5s; visibility: hidden; overflow-y: auto; box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
+        .sidebar.active { width: 300px; visibility: visible; }
+        .sidebar-links a { padding: 15px 32px; text-decoration: none; font-size: 14px; color: #444; display: flex; align-items: center; gap: 15px; transition: 0.3s; border-left: 3px solid transparent; cursor: pointer; }
+        .sidebar-links a:hover { background: #f9f9f9; color: var(--accent); border-left: 3px solid var(--accent); }
 
-        /* Hero & Parallax */
-        .hero { height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=2000'); background-size: cover; background-attachment: fixed; text-align: center; }
-        .hero-card { background: white; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); transform-style: preserve-3d; transition: transform 0.1s; }
-        
-        /* Reveal Animations */
-        .reveal { opacity: 0; transform: translateY(40px); transition: 1s all ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* Hero & Parallax */
+        .hero { height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=2000'); background-size: cover; background-attachment: fixed; text-align: center; }
+        .hero-card { background: white; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); transform-style: preserve-3d; transition: transform 0.1s; }
+        
+        /* Reveal Animations */
+        .reveal { opacity: 0; transform: translateY(40px); transition: 1s all ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Product Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 50px; padding: 100px 10%; }
-        .card { background: #fff; padding: 20px; transition: 0.5s; position: relative; }
-        .card img { width: 100%; height: 450px; object-fit: cover; }
+        /* Product Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 50px; padding: 100px 10%; }
+        .card { background: #fff; padding: 20px; transition: 0.5s; position: relative; }
+        .card img { width: 100%; height: 450px; object-fit: cover; }
 
-        /* Side Cart */
-        .side-cart { height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; right: 0; background: #fff; transition: 0.6s cubic-bezier(0.77, 0, 0.175, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.1); overflow-y: auto; }
-        .side-cart.active { width: 400px; }
+        /* Side Cart */
+        .side-cart { height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; right: 0; background: #fff; transition: 0.6s cubic-bezier(0.77, 0, 0.175, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.1); overflow-y: auto; }
+        .side-cart.active { width: 400px; }
 
-        /* Modals & Overlays */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #fff; padding: 50px; width: 90%; max-width: 450px; text-align: center;}
-        .btn-black { background: #000; color: #fff; border: none; padding: 16px 30px; cursor: pointer; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; width: 100%; margin-top: 15px; transition: 0.3s; }
-        input, textarea { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #eee; font-family: 'Montserrat'; outline: none; box-sizing: border-box; }
+        /* Modals & Overlays */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 50px; width: 90%; max-width: 450px; text-align: center;}
+        .btn-black { background: #000; color: #fff; border: none; padding: 16px 30px; cursor: pointer; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; width: 100%; margin-top: 15px; transition: 0.3s; }
+        input, textarea { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #eee; font-family: 'Montserrat'; outline: none; box-sizing: border-box; }
 
-        /* --- NEW AI WIDGET CSS --- */
-        #chat-widget-btn { position: fixed; bottom: 20px; right: 20px; background-color: #000; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; }
-        #chat-widget-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; flex-direction: column; overflow: hidden; }
-        .widget-header { background: #000; color: white; padding: 15px; text-align: center; font-weight: bold; display: flex; justify-content: space-between;}
-        .close-btn { cursor: pointer; color: white; border: none; background: none; font-size: 16px; }
-        .widget-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-        .widget-input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
-        .widget-input-area input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0; }
-        .widget-input-area button { background: #000; color: white; border: none; padding: 8px 15px; margin-left: 5px; cursor: pointer; border-radius: 4px; width: auto;}
-        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 14px; }
-        .msg.user { background: var(--accent); color: white; align-self: flex-end; }
-        .msg.ai { background: #e0e0e0; color: #333; align-self: flex-start; }
-    </style>
+        /* --- NEW AI WIDGET CSS --- */
+        #chat-widget-btn { position: fixed; bottom: 20px; right: 20px; background-color: #000; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; }
+        #chat-widget-window { display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; flex-direction: column; overflow: hidden; }
+        .widget-header { background: #000; color: white; padding: 15px; text-align: center; font-weight: bold; display: flex; justify-content: space-between;}
+        .close-btn { cursor: pointer; color: white; border: none; background: none; font-size: 16px; }
+        .widget-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
+        .widget-input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
+        .widget-input-area input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0; }
+        .widget-input-area button { background: #000; color: white; border: none; padding: 8px 15px; margin-left: 5px; cursor: pointer; border-radius: 4px; width: auto;}
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 14px; }
+        .msg.user { background: var(--accent); color: white; align-self: flex-end; }
+        .msg.ai { background: #e0e0e0; color: #333; align-self: flex-start; }
+    </style>
 </head>
 <body>
 
-    <div id="mySidebar" class="sidebar">
-        <span style="position:absolute; top:30px; right:25px; cursor:pointer; font-size:24px;" onclick="toggleSidebar(false)"><i class="bi bi-x-lg"></i></span>
-        <div style="padding: 100px 32px 20px 32px; border-bottom: 1px solid #f0f0f0;">
-            <h4 id="user-name" style="margin:0; font-family:'Playfair Display'; font-size:24px;">Guest Explorer</h4>
-            <p id="user-status" style="font-size:10px; color:#aaa; letter-spacing:1px; margin-top:5px; text-transform:uppercase;">Sign in via Profile</p>
-        </div>
-        <div class="sidebar-links">
-            <a href="#home" onclick="toggleSidebar(false)"><i class="bi bi-house"></i> Home</a>
-            <a onclick="handleProfileClick()"><i class="bi bi-person"></i> <span id="auth-link-text">Sign In / Profile</span></a>
-            <a href="dashboard.html"><i class="bi bi-bag-check"></i> Your Orders</a>
-            <a id="founder-link" href="founder-dashboard.html" style="display:none; color: var(--accent); font-weight: bold;"><i class="bi bi-shield-lock"></i> Founder Panel</a>
-            <a href="https://wa.me/919480119825" target="_blank"><i class="bi bi-whatsapp"></i> Support</a>
-            <a id="logout-btn" style="display:none; color:red;" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </div>
-    </div>
-
-    <nav id="home">
-        <div style="display:flex; align-items:center; gap:30px;">
-            <i class="bi bi-list" style="font-size: 24px; cursor: pointer;" onclick="toggleSidebar(true)"></i>
-            <img src="logo.jpeg" alt="Giftowave" class="logo-img">
-        </div>
-        <div onclick="toggleCart(true)" style="background:#000; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">
-            <span id="cart-count">0</span> <i class="bi bi-bag" style="margin-left:8px;"></i>
-        </div>
-    </nav>
-
-    <div class="hero">
-        <div class="hero-card" id="parallax-card">
-            <h1 style="font-family:'Playfair Display'; font-size:50px; margin:0;">Handcrafted <br> Memories</h1>
-            <p style="font-size: 12px; letter-spacing: 2px; color: #888; margin-top: 10px;">PREMIUM MAGAZINE STUDIO</p>
-            <button class="btn-black" style="width:auto; padding:18px 40px; margin-top:30px;" onclick="scrollToProducts()">EXPLORE</button>
-        </div>
-    </div>
-
-    <div class="grid" id="product-grid">
-        <div class="card reveal">
-            <img src="priyanka.jpeg" alt="Vogue">
-            <h3>The Vogue Edition</h3>
-            <p style="color:var(--accent);">999.00 INR</p>
-            <button class="btn-black" onclick="addToCart('The Vogue Edition', 999)">Add to Cart</button>
-        </div>
-        <div class="card reveal">
-            <img src="friends.jpeg" alt="Friends">
-            <h3>The F.R.I.E.N.D.S Issue</h3>
-            <p style="color:var(--accent);">1,299.00 INR</p>
-            <button class="btn-black" onclick="addToCart('The F.R.I.E.N.D.S Issue', 1299)">Add to Cart</button>
-        </div>
-    </div>
-
-    <div id="sideCart" class="side-cart">
-        <span style="position:absolute; top:30px; left:30px; cursor:pointer; font-size:24px;" onclick="toggleCart(false)"><i class="bi bi-arrow-right"></i></span>
-        <div style="padding:40px;">
-            <h2 style="font-family:'Playfair Display'; font-size:30px; margin-bottom:40px;">Boutique Cart</h2>
-            <div id="cart-items-list"><p style="color:#999; font-size:12px;">EMPTY SELECTION...</p></div>
-            <div id="cart-summary" style="margin-top:40px; display:none; border-top:1px solid #eee; padding-top:20px;">
-                <p style="letter-spacing:2px; font-size:13px;">SUBTOTAL: <span id="cart-total-price">0</span> INR</p>
-                <button class="btn-black" onclick="openCheckoutModal()">Secure Checkout</button>
+    <div id="mySidebar" class="sidebar">
+        <span style="position:absolute; top:30px; right:25px; cursor:pointer; font-size:24px;" onclick="toggleSidebar(false)"><i class="bi bi-x-lg"></i></span>
+        <div style="padding: 100px 32px 20px 32px; border-bottom: 1px solid #f0f0f0;">
+            <h4 id="user-name" style="margin:0; font-family:'Playfair Display'; font-size:24px;">Guest Explorer</h4>
+            <p id="user-status" style="font-size:10px; color:#aaa; letter-spacing:1px; margin-top:5px; text-transform:uppercase;">Sign in via Profile</p>
+        </div>
+        <div class="sidebar-links">
+            <a href="#home" onclick="toggleSidebar(false)"><i class="bi bi-house"></i> Home</a>
+            <a onclick="handleProfileClick()"><i class="bi bi-person"></i> <span id="auth-link-text">Sign In / Profile</span></a>
+            <a href="dashboard.html"><i class="bi bi-bag-check"></i> Your Orders</a>
+            <a id="founder-link" href="founder-dashboard.html" style="display:none; color: var(--accent); font-weight: bold;"><i class="bi bi-shield-lock"></i> Founder Panel</a>
+            <a href="https://wa.me/919480119825" target="_blank"><i class="bi bi-whatsapp"></i> Support</a>
+            <a id="logout-btn" style="display:none; color:red;" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            
+            <div style="display: flex; flex-direction: row;">
+                <a href="#policy" style="width: 50%; padding: 15px 10px 15px 32px;">Policy</a>
+                <a href="#contact" style="width: 50%; padding: 15px 10px;">Contact Us</a>
             </div>
-        </div>
-    </div>
+        </div>
+    </div>
 
-    <div id="loginModal" class="overlay">
-        <div class="modal-content">
-            <h2 style="font-family:'Playfair Display'">Giftowave Identity</h2>
-            <p style="font-size:12px; color:#888; margin-bottom:30px;">Join the studio to track orders and save your curations.</p>
-            <div id="g_id_onload" data-client_id="191068266437-c5pfe4s011l2k3jhdpfadih3ndan1sfv.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
-            <div class="g_id_signin" data-type="standard"></div>
-            <p style="margin-top:20px; font-size:11px; cursor:pointer;" onclick="closeLoginModal()">Continue as Guest</p>
-        </div>
-    </div>
+    <nav id="home">
+        <div style="display:flex; align-items:center; gap:30px;">
+            <i class="bi bi-list" style="font-size: 24px; cursor: pointer;" onclick="toggleSidebar(true)"></i>
+            <img src="logo.jpeg" alt="Giftowave" class="logo-img">
+        </div>
+        <div onclick="toggleCart(true)" style="background:#000; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">
+            <span id="cart-count">0</span> <i class="bi bi-bag" style="margin-left:8px;"></i>
+        </div>
+    </nav>
 
-    <div id="checkoutModal" class="overlay">
-        <div class="modal-content">
-            <h2 style="font-family:'Playfair Display'; font-size:28px; margin-bottom:30px;">Shipping</h2>
-            <input type="text" id="custName" placeholder="Full Name">
-            <input type="text" id="custPhone" placeholder="WhatsApp Number">
-            <textarea id="custAddress" placeholder="Full Address" rows="3"></textarea>
-            <button class="btn-black" onclick="processPayment()">Confirm & Pay</button>
-            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:20px;" onclick="closeCheckoutModal()">CANCEL</p>
-        </div>
-    </div>
+    <div class="hero">
+        <div class="hero-card" id="parallax-card">
+            <h1 style="font-family:'Playfair Display'; font-size:50px; margin:0;">Handcrafted <br> Memories</h1>
+            <p style="font-size: 12px; letter-spacing: 2px; color: #888; margin-top: 10px;">PREMIUM MAGAZINE STUDIO</p>
+            <button class="btn-black" style="width:auto; padding:18px 40px; margin-top:30px;" onclick="scrollToProducts()">EXPLORE</button>
+        </div>
+    </div>
 
-    <button id="chat-widget-btn" onclick="toggleChat()">💬</button>
-    <div id="chat-widget-window">
-        <div class="widget-header">
-            <span style="font-family:'Playfair Display'">Giftowave Assistant</span>
-            <button class="close-btn" onclick="toggleChat()">✖</button>
-        </div>
-        <div class="widget-body" id="widgetChatBox">
-            <div class="msg ai">Hi! Need help with your custom magazine?</div>
-        </div>
-        <div class="widget-input-area">
-            <input type="text" id="widgetInput" placeholder="Type a message..." onkeypress="handleWidgetEnter(event)">
-            <button onclick="sendWidgetMessage()">Send</button>
-        </div>
-    </div>
+    <div class="grid" id="product-grid">
+        <div class="card reveal">
+            <img src="priyanka.jpeg" alt="Vogue">
+            <h3>The Vogue Edition</h3>
+            <p style="color:var(--accent);">999.00 INR</p>
+            <button class="btn-black" onclick="addToCart('The Vogue Edition', 999)">Add to Cart</button>
+        </div>
+        <div class="card reveal">
+            <img src="friends.jpeg" alt="Friends">
+            <h3>The F.R.I.E.N.D.S Issue</h3>
+            <p style="color:var(--accent);">1,299.00 INR</p>
+            <button class="btn-black" onclick="addToCart('The F.R.I.E.N.D.S Issue', 1299)">Add to Cart</button>
+        </div>
+    </div>
 
-    <script>
-        let cart = [];
+    <div id="sideCart" class="side-cart">
+        <span style="position:absolute; top:30px; left:30px; cursor:pointer; font-size:24px;" onclick="toggleCart(false)"><i class="bi bi-arrow-right"></i></span>
+        <div style="padding:40px;">
+            <h2 style="font-family:'Playfair Display'; font-size:30px; margin-bottom:40px;">Boutique Cart</h2>
+            <div id="cart-items-list"><p style="color:#999; font-size:12px;">EMPTY SELECTION...</p></div>
+            <div id="cart-summary" style="margin-top:40px; display:none; border-top:1px solid #eee; padding-top:20px;">
+                <p style="letter-spacing:2px; font-size:13px;">SUBTOTAL: <span id="cart-total-price">0</span> INR</p>
+                <button class="btn-black" onclick="openCheckoutModal()">Secure Checkout</button>
+            </div>
+        </div>
+    </div>
 
-        // --- Session Management ---
-        window.onload = () => {
-            const token = localStorage.getItem('gt_token');
-            const user = JSON.parse(localStorage.getItem('gt_user'));
-            if(token && user) updateUIForLoggedInUser(user);
-        };
+    <div id="loginModal" class="overlay">
+        <div class="modal-content">
+            <h2 style="font-family:'Playfair Display'">Giftowave Identity</h2>
+            <p style="font-size:12px; color:#888; margin-bottom:30px;">Join the studio to track orders and save your curations.</p>
+            <div id="g_id_onload" data-client_id="191068266437-c5pfe4s011l2k3jhdpfadih3ndan1sfv.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
+            <div class="g_id_signin" data-type="standard"></div>
+            <p style="margin-top:20px; font-size:11px; cursor:pointer;" onclick="closeLoginModal()">Continue as Guest</p>
+        </div>
+    </div>
 
-        function handleCredentialResponse(response) {
-            fetch('/api/auth/google', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ idToken: response.credential })
-            })
-            .then(res => res.json())
-            .then(data => {
-                localStorage.setItem('gt_token', data.token);
-                localStorage.setItem('gt_user', JSON.stringify(data.user));
-                updateUIForLoggedInUser(data.user);
-                closeLoginModal();
-            });
-        }
+    <div id="checkoutModal" class="overlay">
+        <div class="modal-content">
+            <h2 style="font-family:'Playfair Display'; font-size:28px; margin-bottom:30px;">Shipping</h2>
+            <input type="text" id="custName" placeholder="Full Name">
+            <input type="text" id="custPhone" placeholder="WhatsApp Number">
+            <textarea id="custAddress" placeholder="Full Address" rows="3"></textarea>
+            <button class="btn-black" onclick="processPayment()">Confirm & Pay</button>
+            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:20px;" onclick="closeCheckoutModal()">CANCEL</p>
+        </div>
+    </div>
 
-        function updateUIForLoggedInUser(user) {
-            const nameEl = document.getElementById('user-name');
-            const statusEl = document.getElementById('user-status');
-            const logoutBtn = document.getElementById('logout-btn');
-            const authText = document.getElementById('auth-link-text');
-            const founderLink = document.getElementById('founder-link');
+    <button id="chat-widget-btn" onclick="toggleChat()">💬</button>
+    <div id="chat-widget-window">
+        <div class="widget-header">
+            <span style="font-family:'Playfair Display'">Giftowave Assistant</span>
+            <button class="close-btn" onclick="toggleChat()">✖</button>
+        </div>
+        <div class="widget-body" id="widgetChatBox">
+            <div class="msg ai">Hi! Need help with your custom magazine?</div>
+        </div>
+        <div class="widget-input-area">
+            <input type="text" id="widgetInput" placeholder="Type a message..." onkeypress="handleWidgetEnter(event)">
+            <button onclick="sendWidgetMessage()">Send</button>
+        </div>
+    </div>
 
-            if(nameEl) nameEl.innerText = user.name;
-            if(statusEl) statusEl.innerText = "PREMIUM MEMBER";
-            if(authText) authText.innerText = "Your Profile";
-            if(logoutBtn) logoutBtn.style.display = "flex";
-            if(user.isAdmin && founderLink) founderLink.style.display = "flex";
-        }
+    <script>
+        let cart = [];
 
-        // --- Secure Razorpay Integration ---
-        async function processPayment() {
-            const token = localStorage.getItem('gt_token');
-            const address = document.getElementById('custAddress').value;
+        // --- Session Management ---
+        window.onload = () => {
+            const token = localStorage.getItem('gt_token');
+            const user = JSON.parse(localStorage.getItem('gt_user'));
+            if(token && user) updateUIForLoggedInUser(user);
+        };
 
-            if(!token) return openLoginModal();
-            if(!address) return alert("Please provide shipping address.");
-            
-            const total = cart.reduce((s,i) => s + i.p, 0);
+        function handleCredentialResponse(response) {
+            fetch('/api/auth/google', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ idToken: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                localStorage.setItem('gt_token', data.token);
+                localStorage.setItem('gt_user', JSON.stringify(data.user));
+                updateUIForLoggedInUser(data.user);
+                closeLoginModal();
+            });
+        }
 
-            try {
-                // 1. Create order on server
-                const orderRes = await fetch('/api/create-order', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-                    body: JSON.stringify({amount: total})
-                });
-                const orderData = await orderRes.json();
+        function updateUIForLoggedInUser(user) {
+            const nameEl = document.getElementById('user-name');
+            const statusEl = document.getElementById('user-status');
+            const logoutBtn = document.getElementById('logout-btn');
+            const authText = document.getElementById('auth-link-text');
+            const founderLink = document.getElementById('founder-link');
 
-                // 2. Open Razorpay Popup
-                const options = {
-                    "key": "rzp_test_SV5QxCbNRxErQt",
-                    "amount": orderData.amount,
-                    "currency": "INR",
-                    "name": "Giftowave Studio",
-                    "order_id": orderData.id,
-                    "handler": async function (response) {
-                        // 3. Save order after success
-                        await fetch('/api/orders', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-                            body: JSON.stringify({
-                                product: cart.map(i=>i.n).join(", "),
-                                amount: total,
-                                address: address,
-                                paymentId: response.razorpay_payment_id
-                            })
-                        });
-                        alert("Order Placed Successfully!");
-                        window.location.href = `https://wa.me/919480119825?text=Hi! Order confirmed. PaymentID: ${response.razorpay_payment_id}`;
-                    },
-                    "theme": { "color": "#d4a373" }
-                };
-                new Razorpay(options).open();
-            } catch(e) { alert("Gateway connection failed."); }
-        }
+            if(nameEl) nameEl.innerText = user.name;
+            if(statusEl) statusEl.innerText = "PREMIUM MEMBER";
+            if(authText) authText.innerText = "Your Profile";
+            if(logoutBtn) logoutBtn.style.display = "flex";
+            if(user.isAdmin && founderLink) founderLink.style.display = "flex";
+        }
 
-        // --- Interaction Logic ---
-        function toggleSidebar(o) { 
-            const s = document.getElementById("mySidebar"); 
-            if(s) {
-                s.style.width = o ? "300px" : "0"; 
-                s.classList.toggle("active", o); 
-            }
-        }
-        function toggleCart(o) { 
-            const c = document.getElementById("sideCart"); 
-            if(c) c.classList.toggle("active", o); 
-        }
-        function addToCart(n, p) { 
-            cart.push({n, p}); 
-            updateCartUI(); 
-            toggleCart(true); 
-        }
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
-            const list = document.getElementById('cart-items-list');
-            const sum = document.getElementById('cart-summary');
-            if(cart.length === 0) {
-                list.innerHTML = '<p style="color:#999; font-size:12px;">EMPTY SELECTION...</p>';
-                sum.style.display = "none";
-            } else {
-                list.innerHTML = cart.map((i, idx) => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:12px;">
-                        <span>${i.n}</span>
-                        <span>${i.p} <i class="bi bi-x" style="cursor:pointer" onclick="removeItem(${idx})"></i></span>
-                    </div>`).join('');
-                document.getElementById('cart-total-price').innerText = cart.reduce((s,i)=>s+i.p,0);
-                sum.style.display = "block";
-            }
-        }
-        function removeItem(idx) { cart.splice(idx, 1); updateCartUI(); }
-        function openLoginModal() { toggleSidebar(false); document.getElementById('loginModal').style.display = 'flex'; }
-        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
-        function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
-        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
-        function handleProfileClick() { if(localStorage.getItem('gt_token')) window.location.href='dashboard.html'; else openLoginModal(); }
-        function logout() { localStorage.clear(); window.location.reload(); }
-        function scrollToProducts() { document.getElementById('product-grid').scrollIntoView({behavior:'smooth'}); }
+        // --- Secure Razorpay Integration ---
+        async function processPayment() {
+            const token = localStorage.getItem('gt_token');
+            const address = document.getElementById('custAddress').value;
 
-        // Parallax Effect
-        document.addEventListener('mousemove', (e) => {
-            const card = document.getElementById('parallax-card');
-            if(card) {
-                const x = (window.innerWidth / 2 - e.pageX) / 30;
-                const y = (window.innerHeight / 2 - e.pageY) / 30;
-                card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-            }
-        });
+            if(!token) return openLoginModal();
+            if(!address) return alert("Please provide shipping address.");
+            
+            const total = cart.reduce((s,i) => s + i.p, 0);
 
-        const observer = new IntersectionObserver((e) => e.forEach(en => en.isIntersecting && en.target.classList.add('active')), {threshold: 0.1});
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            try {
+                // 1. Create order on server
+                const orderRes = await fetch('/api/create-order', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                    body: JSON.stringify({amount: total})
+                });
+                const orderData = await orderRes.json();
 
-        // --- NEW AI WIDGET LOGIC ---
-        function toggleChat() {
-            const chatWindow = document.getElementById('chat-widget-window');
-            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
-        }
+                // 2. Open Razorpay Popup
+                const options = {
+                    "key": "rzp_test_SV5QxCbNRxErQt",
+                    "amount": orderData.amount,
+                    "currency": "INR",
+                    "name": "Giftowave Studio",
+                    "order_id": orderData.id,
+                    "handler": async function (response) {
+                        // 3. Save order after success
+                        await fetch('/api/orders', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                            body: JSON.stringify({
+                                product: cart.map(i=>i.n).join(", "),
+                                amount: total,
+                                address: address,
+                                paymentId: response.razorpay_payment_id
+                            })
+                        });
+                        alert("Order Placed Successfully!");
+                        window.location.href = `https://wa.me/919480119825?text=Hi! Order confirmed. PaymentID: ${response.razorpay_payment_id}`;
+                    },
+                    "theme": { "color": "#d4a373" }
+                };
+                new Razorpay(options).open();
+            } catch(e) { alert("Gateway connection failed."); }
+        }
 
-        async function sendWidgetMessage() {
-            const input = document.getElementById('widgetInput');
-            const chatBox = document.getElementById('widgetChatBox');
-            const text = input.value.trim();
+        // --- Interaction Logic ---
+        function toggleSidebar(o) { 
+            const s = document.getElementById("mySidebar"); 
+            if(s) {
+                s.style.width = o ? "300px" : "0"; 
+                s.classList.toggle("active", o); 
+            }
+        }
+        function toggleCart(o) { 
+            const c = document.getElementById("sideCart"); 
+            if(c) c.classList.toggle("active", o); 
+        }
+        function addToCart(n, p) { 
+            cart.push({n, p}); 
+            updateCartUI(); 
+            toggleCart(true); 
+        }
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const list = document.getElementById('cart-items-list');
+            const sum = document.getElementById('cart-summary');
+            if(cart.length === 0) {
+                list.innerHTML = '<p style="color:#999; font-size:12px;">EMPTY SELECTION...</p>';
+                sum.style.display = "none";
+            } else {
+                list.innerHTML = cart.map((i, idx) => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:12px;">
+                        <span>${i.n}</span>
+                        <span>${i.p} <i class="bi bi-x" style="cursor:pointer" onclick="removeItem(${idx})"></i></span>
+                    </div>`).join('');
+                document.getElementById('cart-total-price').innerText = cart.reduce((s,i)=>s+i.p,0);
+                sum.style.display = "block";
+            }
+        }
+        function removeItem(idx) { cart.splice(idx, 1); updateCartUI(); }
+        function openLoginModal() { toggleSidebar(false); document.getElementById('loginModal').style.display = 'flex'; }
+        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+        function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
+        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
+        function handleProfileClick() { if(localStorage.getItem('gt_token')) window.location.href='dashboard.html'; else openLoginModal(); }
+        function logout() { localStorage.clear(); window.location.reload(); }
+        function scrollToProducts() { document.getElementById('product-grid').scrollIntoView({behavior:'smooth'}); }
 
-            if (!text) return;
+        // Parallax Effect
+        document.addEventListener('mousemove', (e) => {
+            const card = document.getElementById('parallax-card');
+            if(card) {
+                const x = (window.innerWidth / 2 - e.pageX) / 30;
+                const y = (window.innerHeight / 2 - e.pageY) / 30;
+                card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+            }
+        });
 
-            // Add User Message
-            chatBox.innerHTML += `<div class="msg user">${text}</div>`;
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
+        const observer = new IntersectionObserver((e) => e.forEach(en => en.isIntersecting && en.target.classList.add('active')), {threshold: 0.1});
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-            // Add Loading text
-            const tempId = "loading-" + Date.now();
-            chatBox.innerHTML += `<div class="msg ai" id="${tempId}">Thinking...</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
+        // --- NEW AI WIDGET LOGIC ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-widget-window');
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
 
-            try {
-                // Call the Node route we built earlier
-                const response = await fetch('/api/ask-giftowave-agent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
+        async function sendWidgetMessage() {
+            const input = document.getElementById('widgetInput');
+            const chatBox = document.getElementById('widgetChatBox');
+            const text = input.value.trim();
 
-                const data = await response.json();
-                document.getElementById(tempId).remove(); // Remove loading text
+            if (!text) return;
 
-                if (data.reply) {
-                    chatBox.innerHTML += `<div class="msg ai">${data.reply}</div>`;
-                } else {
-                    chatBox.innerHTML += `<div class="msg ai" style="color:red;">Error connecting.</div>`;
-                }
-            } catch (error) {
-                document.getElementById(tempId).remove();
-                chatBox.innerHTML += `<div class="msg ai" style="color:red;">Server offline.</div>`;
-            }
-            
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+            // Add User Message
+            chatBox.innerHTML += `<div class="msg user">${text}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-        function handleWidgetEnter(event) {
-            if (event.key === 'Enter') sendWidgetMessage();
-        }
-    </script>
+            // Add Loading text
+            const tempId = "loading-" + Date.now();
+            chatBox.innerHTML += `<div class="msg ai" id="${tempId}">Thinking...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // Call the Node route we built earlier
+                const response = await fetch('/api/ask-giftowave-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+                document.getElementById(tempId).remove(); // Remove loading text
+
+                if (data.reply) {
+                    chatBox.innerHTML += `<div class="msg ai">${data.reply}</div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="msg ai" style="color:red;">Error connecting.</div>`;
+                }
+            } catch (error) {
+                document.getElementById(tempId).remove();
+                chatBox.innerHTML += `<div class="msg ai" style="color:red;">Server offline.</div>`;
+            }
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleWidgetEnter(event) {
+            if (event.key === 'Enter') sendWidgetMessage();
+        }
+    </script>
 </body>
 </html>
