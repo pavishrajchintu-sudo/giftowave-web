@@ -9,7 +9,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
@@ -45,7 +45,8 @@
 
         /* Modals & Overlays */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #fff; padding: 50px; width: 90%; max-width: 450px; text-align: center;}
+        .modal-content { background: #fff; padding: 50px; width: 90%; max-width: 450px; text-align: center; position: relative; }
+        .modal-scrollable { max-height: 80vh; overflow-y: auto; text-align: left; padding: 40px; }
         .btn-black { background: #000; color: #fff; border: none; padding: 16px 30px; cursor: pointer; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; width: 100%; margin-top: 15px; transition: 0.3s; }
         input, textarea { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #eee; font-family: 'Montserrat'; outline: none; box-sizing: border-box; }
 
@@ -80,8 +81,8 @@
             <a id="logout-btn" style="display:none; color:red;" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
             
             <div style="border-top: 1px solid #f0f0f0; margin-top: 10px; padding-top: 10px;">
-                <a href="#policy" onclick="toggleSidebar(false)"><i class="bi bi-shield-check"></i> Policy</a>
-                <a href="#contact" onclick="toggleSidebar(false)"><i class="bi bi-envelope"></i> Contact Us</a>
+                <a onclick="openPolicyModal()"><i class="bi bi-shield-check"></i> Policy</a>
+                <a onclick="openContactModal()"><i class="bi bi-envelope"></i> Contact Us</a>
             </div>
         </div>
     </div>
@@ -137,7 +138,7 @@
             <p style="font-size:12px; color:#888; margin-bottom:30px;">Join the studio to track orders and save your curations.</p>
             <div id="g_id_onload" data-client_id="191068266437-c5pfe4s011l2k3jhdpfadih3ndan1sfv.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
             <div class="g_id_signin" data-type="standard"></div>
-            <p style="margin-top:20px; font-size:11px; cursor:pointer;" onclick="closeLoginModal()">Continue as Guest</p>
+            <p style="margin-top:20px; font-size:11px; cursor:pointer;" onclick="closeModal('loginModal')">Continue as Guest</p>
         </div>
     </div>
 
@@ -148,7 +149,85 @@
             <input type="text" id="custPhone" placeholder="WhatsApp Number">
             <textarea id="custAddress" placeholder="Full Address" rows="3"></textarea>
             <button class="btn-black" onclick="processPayment()">Confirm & Pay</button>
-            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:20px;" onclick="closeCheckoutModal()">CANCEL</p>
+            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:20px;" onclick="closeModal('checkoutModal')">CANCEL</p>
+        </div>
+    </div>
+
+    <div id="policyModal" class="overlay">
+        <div class="modal-content modal-scrollable" style="max-width: 600px;">
+            <h2 style="font-family:'Playfair Display'; text-align: center; margin-bottom: 20px;">Store Policies</h2>
+
+            <h4 style="color: var(--accent); margin-top: 20px; margin-bottom: 5px;">1. Shipping & Delivery Policy</h4>
+            <p style="font-size: 13px; font-weight: 700; margin-bottom: 5px;">Order Processing & Timelines</p>
+            <p style="font-size: 12px; color: #555; margin-top: 0;">At Giftowave, every personalized magazine is custom-made to order. Please note our standard processing schedule:</p>
+            <ul style="font-size: 12px; color: #555; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Design Phase:</strong> 3 business days from the time we receive your photos and details.</li>
+                <li><strong>Printing Phase:</strong> 2 business days after the design is finalized.</li>
+                <li><strong>Shipping Phase:</strong> 6 to 7 business days in transit.</li>
+            </ul>
+            <p style="font-size: 12px; color: #555; background: #f9f9f9; padding: 10px; border-left: 3px solid var(--accent);"><strong>Total Estimated Time:</strong> You can expect your order to arrive within 11 to 12 business days from the date of order placement.</p>
+
+            <p style="font-size: 13px; font-weight: 700; margin-top: 20px; margin-bottom: 5px;">Shipping Partner & Tracking</p>
+            <p style="font-size: 12px; color: #555; margin-top: 0;">All orders are shipped exclusively via <strong>Delhivery</strong>. Once handed over, you will receive a confirmation email and SMS containing your tracking link to track your package in real-time.</p>
+
+            <h4 style="color: var(--accent); margin-top: 30px; margin-bottom: 5px;">2. Cancellation & Refund Policy</h4>
+            <p style="font-size: 13px; font-weight: 700; margin-bottom: 5px;">Cancellations</p>
+            <ul style="font-size: 12px; color: #555; padding-left: 20px; line-height: 1.6;">
+                <li>Orders can only be canceled within a strict <strong>2-hour window</strong> of placement for a full refund.</li>
+                <li>Once the design phase has begun, cancellations are no longer accepted as custom work is underway.</li>
+                <li>Once a magazine is completed, it cannot be refunded at any cost.</li>
+            </ul>
+
+            <p style="font-size: 13px; font-weight: 700; margin-top: 20px; margin-bottom: 5px;">Refunds & Replacements</p>
+            <p style="font-size: 12px; color: #555; margin-top: 0;">We do not offer refunds/returns for buyer's remorse or customer errors (e.g., typos or low-resolution image uploads). We issue a free replacement or full refund only if:</p>
+            <ul style="font-size: 12px; color: #555; padding-left: 20px; line-height: 1.6;">
+                <li>The product is damaged during transit.</li>
+                <li>There is a clear manufacturing defect or printing error on our end.</li>
+            </ul>
+            <p style="font-size: 12px; color: #555;"><strong>Claim Process:</strong> Contact us within 48 hours of delivery at <a href="mailto:giftowave@gmail.com" style="color:var(--accent);">giftowave@gmail.com</a>. An <strong>uninterrupted unboxing video</strong>, recorded from the very beginning of opening the sealed package, is strictly required. Without this video, claims cannot be processed. Approved claims are processed within 3-5 business days.</p>
+
+            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:30px; letter-spacing: 2px;" onclick="closeModal('policyModal')">CLOSE</p>
+        </div>
+    </div>
+
+    <div id="contactModal" class="overlay">
+        <div class="modal-content" style="text-align: left;">
+            <h2 style="font-family:'Playfair Display'; text-align: center; margin-bottom: 10px;">Contact Us</h2>
+            <p style="font-size: 13px; color: #888; text-align: center; margin-bottom: 30px;">We're here to help with your curations!</p>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                <i class="bi bi-envelope" style="font-size: 24px; color: var(--accent);"></i>
+                <div>
+                    <strong style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Email Support</strong><br>
+                    <a href="mailto:giftowave@gmail.com" style="color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500;">giftowave@gmail.com</a>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                <i class="bi bi-telephone" style="font-size: 24px; color: var(--accent);"></i>
+                <div>
+                    <strong style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Phone / WhatsApp</strong><br>
+                    <a href="https://wa.me/919480119825" target="_blank" style="color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500;">+91 94801 19825</a>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                <i class="bi bi-clock" style="font-size: 24px; color: var(--accent);"></i>
+                <div>
+                    <strong style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Operating Hours</strong><br>
+                    <span style="font-size: 14px; color: var(--text);">Monday to Saturday<br>10:00 AM – 6:00 PM</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                <i class="bi bi-geo-alt" style="font-size: 24px; color: var(--accent);"></i>
+                <div>
+                    <strong style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Registered Address</strong><br>
+                    <span style="font-size: 14px; color: var(--text); line-height: 1.5;">3225, 11th Main, 4th Cross,<br>MCC B Block, Davangere 577004</span>
+                </div>
+            </div>
+
+            <p style="text-align:center; cursor:pointer; font-size:11px; color:#aaa; margin-top:30px; letter-spacing: 2px;" onclick="closeModal('contactModal')">CLOSE</p>
         </div>
     </div>
 
@@ -188,7 +267,7 @@
                 localStorage.setItem('gt_token', data.token);
                 localStorage.setItem('gt_user', JSON.stringify(data.user));
                 updateUIForLoggedInUser(data.user);
-                closeLoginModal();
+                closeModal('loginModal');
             });
         }
 
@@ -211,13 +290,12 @@
             const token = localStorage.getItem('gt_token');
             const address = document.getElementById('custAddress').value;
 
-            if(!token) return openLoginModal();
+            if(!token) return document.getElementById('loginModal').style.display = 'flex';
             if(!address) return alert("Please provide shipping address.");
             
             const total = cart.reduce((s,i) => s + i.p, 0);
 
             try {
-                // 1. Create order on server
                 const orderRes = await fetch('/api/create-order', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
@@ -225,7 +303,6 @@
                 });
                 const orderData = await orderRes.json();
 
-                // 2. Open Razorpay Popup
                 const options = {
                     "key": "rzp_test_SV5QxCbNRxErQt",
                     "amount": orderData.amount,
@@ -233,7 +310,6 @@
                     "name": "Giftowave Studio",
                     "order_id": orderData.id,
                     "handler": async function (response) {
-                        // 3. Save order after success
                         await fetch('/api/orders', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
@@ -288,11 +364,14 @@
             }
         }
         function removeItem(idx) { cart.splice(idx, 1); updateCartUI(); }
-        function openLoginModal() { toggleSidebar(false); document.getElementById('loginModal').style.display = 'flex'; }
-        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+        
+        // Universal Modal Functions
+        function openPolicyModal() { toggleSidebar(false); document.getElementById('policyModal').style.display = 'flex'; }
+        function openContactModal() { toggleSidebar(false); document.getElementById('contactModal').style.display = 'flex'; }
         function openCheckoutModal() { toggleCart(false); document.getElementById('checkoutModal').style.display = 'flex'; }
-        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
-        function handleProfileClick() { if(localStorage.getItem('gt_token')) window.location.href='dashboard.html'; else openLoginModal(); }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+        
+        function handleProfileClick() { if(localStorage.getItem('gt_token')) window.location.href='dashboard.html'; else document.getElementById('loginModal').style.display = 'flex'; }
         function logout() { localStorage.clear(); window.location.reload(); }
         function scrollToProducts() { document.getElementById('product-grid').scrollIntoView({behavior:'smooth'}); }
 
@@ -322,18 +401,15 @@
 
             if (!text) return;
 
-            // Add User Message
             chatBox.innerHTML += `<div class="msg user">${text}</div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Add Loading text
             const tempId = "loading-" + Date.now();
             chatBox.innerHTML += `<div class="msg ai" id="${tempId}">Thinking...</div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Call the Node route we built earlier
                 const response = await fetch('/api/ask-giftowave-agent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -341,7 +417,7 @@
                 });
 
                 const data = await response.json();
-                document.getElementById(tempId).remove(); // Remove loading text
+                document.getElementById(tempId).remove(); 
 
                 if (data.reply) {
                     chatBox.innerHTML += `<div class="msg ai">${data.reply}</div>`;
