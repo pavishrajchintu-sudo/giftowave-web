@@ -10,18 +10,24 @@ const app = express();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // --- Razorpay Setup ---
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+const razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
+    ? new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+    })
+    : null;
 
 app.use(express.json());
 app.use(express.static('public'));
 
 // --- Database Connection ---
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ Giftowave DB Connected"))
-    .catch(err => console.error("❌ DB Error Details:", err));
+if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI)
+        .then(() => console.log("✅ Giftowave DB Connected"))
+        .catch(err => console.error("❌ DB Error Details:", err));
+} else {
+    console.warn("MONGO_URI is not set. Database-backed routes will fail until it is configured.");
+}
 
 // --- Database Schemas ---
 const userSchema = new mongoose.Schema({
@@ -37,12 +43,27 @@ const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     product: String,
     address: String,
+    customerName: String,
+    customerPhone: String,
+    customization: mongoose.Schema.Types.Mixed,
     amount: Number,
     paymentId: String,
-    status: { type: String, default: 'Paid' },
+    status: { type: String, default: 'Order Placed' },
     date: { type: Date, default: Date.now }
 });
 const Order = mongoose.model('Order', orderSchema);
+
+const ORDER_STATUSES = [
+    'Order Placed',
+    'Photos Received',
+    'Designing',
+    'Preview Sent',
+    'Customer Approved',
+    'Printing',
+    'Packed',
+    'Shipped',
+    'Delivered'
+];
 
 // --- Middleware: Auth Verification ---
 const authenticateToken = (req, res, next) => {
@@ -102,6 +123,10 @@ app.post('/api/auth/google', async (req, res) => {
 // --- PAYMENT: Razorpay Order Creation ---
 app.post('/api/create-order', authenticateToken, async (req, res) => {
     const { amount } = req.body;
+    if (!razorpay) {
+        return res.status(500).json({ error: "Razorpay is not configured" });
+    }
+
     try {
         const options = {
             amount: amount * 100, // Amount in paise
@@ -166,6 +191,27 @@ app.put('/api/admin/order/:id/ship', authenticateToken, async (req, res) => {
         res.json({ success: true, message: "Order marked as shipped" });
     } catch (err) {
         res.status(400).json({ error: "Update failed" });
+    }
+});
+
+app.put('/api/admin/order/:id/status', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+
+    const { status } = req.body;
+    if (!ORDER_STATUSES.includes(status)) {
+        return res.status(400).json({ error: "Invalid order status" });
+    }
+
+    try {
+        const updated = await Order.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+        if (!updated) return res.status(404).json({ error: "Order not found" });
+        res.json({ success: true, order: updated });
+    } catch (err) {
+        res.status(400).json({ error: "Status update failed" });
     }
 });
 

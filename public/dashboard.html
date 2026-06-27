@@ -4,103 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giftowave | Your Studio Profile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #d4a373; --bg: #fdfaf7; --text: #1a1a1a; }
-        body { font-family: 'Montserrat', sans-serif; padding: 50px 10%; background: var(--bg); color: var(--text); }
-        
-        .profile-section { 
-            background: #fff; 
-            padding: 30px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
-            display: flex; 
-            align-items: center; 
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-        .profile-img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); }
-        .profile-details h2 { margin: 0; font-family: 'Playfair Display'; font-size: 28px; }
-        .profile-details p { margin: 5px 0 0 0; color: #888; font-size: 14px; }
-
-        .order-card { 
-            background: #fff; 
-            padding: 25px; 
-            margin-bottom: 20px; 
-            border-left: 5px solid var(--accent); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        :root { --accent: #c46d4d; --teal: #2f6f73; --bg: #fffaf3; --text: #181818; --muted: #70685f; --line: #eadfd1; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; padding: 42px 6vw; margin: 0; background: var(--bg); color: var(--text); }
+        a { color: inherit; text-decoration: none; }
+        .back-link { color: var(--accent); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+        .profile-section {
+            background: #fff;
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 22px;
+            margin: 26px 0 44px;
         }
-        .status-badge { 
-            background: #f0f0f0; 
-            padding: 5px 15px; 
-            border-radius: 20px; 
-            font-size: 10px; 
-            text-transform: uppercase; 
+        .profile-img { width: 78px; height: 78px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .profile-details h1 { margin: 0; font-family: 'Playfair Display', serif; font-size: clamp(30px, 5vw, 48px); }
+        .profile-details p { margin: 6px 0 0; color: var(--muted); }
+        .orders-header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 20px; }
+        .orders-header h2 { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0; }
+        .order-card {
+            background: #fff;
+            padding: 24px;
+            margin-bottom: 18px;
+            border: 1px solid var(--line);
+            border-left: 5px solid var(--accent);
+            border-radius: 8px;
+        }
+        .order-top { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+        .order-top h3 { margin: 0; font-family: 'Playfair Display', serif; font-size: 25px; }
+        .status-badge {
+            background: #eef7f6;
+            color: var(--teal);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 800;
+            white-space: nowrap;
         }
-        .back-link { text-decoration: none; color: var(--accent); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
+        .meta { color: var(--muted); font-size: 13px; line-height: 1.7; }
+        .custom-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .custom-box {
+            background: #fff8ef;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 82px;
+        }
+        .custom-box span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; margin-bottom: 6px; }
+        .custom-box strong { font-size: 13px; line-height: 1.45; }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(9, minmax(76px, 1fr));
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        .timeline-step {
+            border-top: 3px solid #dfd2c5;
+            padding-top: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.35;
+            font-weight: 700;
+        }
+        .timeline-step.done { border-color: var(--teal); color: var(--text); }
+        .empty {
+            text-align: center;
+            padding: 56px 20px;
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            background: #fff;
+        }
+        .empty p { color: var(--muted); }
+        @media (max-width: 760px) {
+            .profile-section, .order-top, .orders-header { flex-direction: column; align-items: flex-start; }
+            .custom-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Studio</a>
+    <a href="index.html" class="back-link">Back to Studio</a>
 
-    <div id="user-profile" class="profile-section">
+    <div id="user-profile" class="profile-section"></div>
+
+    <div class="orders-header">
+        <div>
+            <h2>Order Studio</h2>
+            <p class="meta">Track your custom magazine from order placement to delivery.</p>
         </div>
-
-    <h3 style="font-family: 'Playfair Display'; font-size: 24px; margin-bottom: 25px;">Order History</h3>
+        <a class="back-link" href="index.html#studio">Create another magazine</a>
+    </div>
     <div id="orders-list">Connecting to vault...</div>
 
     <script>
+        const orderStatuses = [
+            'Order Placed',
+            'Photos Received',
+            'Designing',
+            'Preview Sent',
+            'Customer Approved',
+            'Printing',
+            'Packed',
+            'Shipped',
+            'Delivered'
+        ];
+
+        function normalizeCustomization(customization) {
+            if (Array.isArray(customization)) return customization[0] || {};
+            return customization || {};
+        }
+
+        function renderTimeline(status) {
+            const activeIndex = Math.max(orderStatuses.indexOf(status), 0);
+            return `
+                <div class="timeline">
+                    ${orderStatuses.map((step, index) => `<div class="timeline-step ${index <= activeIndex ? 'done' : ''}">${step}</div>`).join('')}
+                </div>
+            `;
+        }
+
         async function initDashboard() {
             const token = localStorage.getItem('gt_token');
             const user = JSON.parse(localStorage.getItem('gt_user'));
 
-            if(!token || !user) {
+            if (!token || !user) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            // 1. Render Profile Details
             document.getElementById('user-profile').innerHTML = `
                 <img src="${user.picture}" class="profile-img" alt="Profile">
                 <div class="profile-details">
-                    <h2>${user.name}</h2>
+                    <h1>${user.name}</h1>
                     <p>${user.email}</p>
-                    <span style="font-size: 10px; color: var(--accent); font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Premium Member</span>
+                    <span style="font-size: 11px; color: var(--accent); font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">Premium Member</span>
                 </div>
             `;
 
-            // 2. Fetch Orders
             try {
                 const res = await fetch('/api/user/orders', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const orders = await res.json();
-                
                 const list = document.getElementById('orders-list');
-                if(orders.length === 0) {
+
+                if (!Array.isArray(orders) || orders.length === 0) {
                     list.innerHTML = `
-                        <div style="text-align: center; padding: 50px; border: 1px dashed #ccc;">
-                            <p style="color: #888;">No curations found in your vault.</p>
-                            <a href="index.html" class="back-link" style="color: black;">Start Creating →</a>
+                        <div class="empty">
+                            <p>No curations found in your vault.</p>
+                            <a href="index.html#studio" class="back-link" style="color: var(--text);">Start Creating</a>
                         </div>
                     `;
-                } else {
-                    list.innerHTML = orders.map(o => `
-                        <div class="order-card">
-                            <div>
-                                <h4 style="margin: 0; font-size: 18px;">${o.product}</h4>
-                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #aaa;">Ordered on ${new Date(o.date).toLocaleDateString()}</p>
-                            </div>
-                            <div class="status-badge">${o.status}</div>
-                        </div>
-                    `).join('');
+                    return;
                 }
+
+                list.innerHTML = orders.map(order => {
+                    const custom = normalizeCustomization(order.customization);
+                    return `
+                        <article class="order-card">
+                            <div class="order-top">
+                                <div>
+                                    <h3>${order.product}</h3>
+                                    <p class="meta">Ordered on ${new Date(order.date).toLocaleDateString()} - ${order.amount || 0} INR</p>
+                                </div>
+                                <div class="status-badge">${order.status || 'Order Placed'}</div>
+                            </div>
+                            <div class="custom-grid">
+                                <div class="custom-box"><span>Recipient</span><strong>${custom.recipientName || 'Not added'}</strong></div>
+                                <div class="custom-box"><span>Occasion</span><strong>${custom.occasion || 'Custom gift'}</strong></div>
+                                <div class="custom-box"><span>Style</span><strong>${custom.template || order.product}</strong></div>
+                                <div class="custom-box"><span>Photos</span><strong>${custom.photoCount || 0} uploaded in preview</strong></div>
+                            </div>
+                            ${renderTimeline(order.status || 'Order Placed')}
+                        </article>
+                    `;
+                }).join('');
             } catch (err) {
-                document.getElementById('orders-list').innerHTML = "<p>Error loading orders. Please refresh.</p>";
+                document.getElementById('orders-list').innerHTML = '<p class="meta">Error loading orders. Please refresh.</p>';
             }
         }
 

@@ -2,47 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giftowave | Founder Panel</title>
     <link rel="icon" type="image/jpeg" href="logo.jpeg">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Playfair+Display&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat'; background: #000; color: #fff; padding: 50px; }
-        .admin-card { background: #111; padding: 30px; border: 1px solid #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #333; color: #d4a373; text-transform: uppercase; font-size: 11px; }
-        td { padding: 15px; border-bottom: 1px solid #222; font-size: 13px; }
-        .ship-btn { background: #d4a373; color: #000; border: none; padding: 5px 10px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        :root { --accent: #d4a373; --dark: #11100f; --panel: #1a1714; --line: #342c25; --muted: #a99a8b; --success: #78d6aa; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: #fff; margin: 0; padding: 42px 5vw; }
+        a { color: var(--accent); text-decoration: none; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+        h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 58px); margin: 18px 0 8px; }
+        p { color: var(--muted); line-height: 1.7; }
+        .admin-shell { max-width: 1240px; margin: 0 auto; }
+        .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 28px 0; }
+        .metric, .order-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+        .metric { padding: 18px; }
+        .metric span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+        .metric strong { display: block; color: #fff; font-size: 30px; margin-top: 8px; }
+        .order-grid { display: grid; gap: 14px; }
+        .order-card { padding: 20px; }
+        .order-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+        .order-head h2 { margin: 0; font-family: 'Playfair Display', serif; font-size: 26px; }
+        .badge { display: inline-flex; border-radius: 999px; padding: 7px 11px; background: #2d271f; color: var(--accent); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; white-space: nowrap; }
+        .detail-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+        .detail { background: #13110f; border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 84px; }
+        .detail span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 6px; }
+        .detail strong { color: #fff; font-size: 13px; line-height: 1.45; word-break: break-word; }
+        .status-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        select {
+            background: #fffaf3;
+            color: #111;
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 12px;
+            min-width: 220px;
+        }
+        button {
+            border: 0;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #111;
+            padding: 11px 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .empty { border: 1px dashed var(--line); border-radius: 8px; padding: 42px; text-align: center; color: var(--muted); }
+        @media (max-width: 980px) {
+            .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 620px) {
+            body { padding: 28px 4vw; }
+            .metrics, .detail-grid { grid-template-columns: 1fr; }
+            .order-head { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
+    <main class="admin-shell">
+        <a href="index.html">Back to Studio</a>
+        <h1>Founder Control</h1>
+        <p>Manage custom magazine orders from photo intake to final delivery.</p>
 
-    <div class="admin-card">
-        <h1 style="font-family: 'Playfair Display';">Founder Control</h1>
-        <p style="color: #666;">Manage all incoming Giftowave orders.</p>
+        <section class="metrics">
+            <div class="metric"><span>Total Orders</span><strong id="metricTotal">0</strong></div>
+            <div class="metric"><span>In Design</span><strong id="metricDesign">0</strong></div>
+            <div class="metric"><span>Printing/Packed</span><strong id="metricProduction">0</strong></div>
+            <div class="metric"><span>Shipped</span><strong id="metricShipped">0</strong></div>
+        </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th>Address</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="admin-rows">
-                </tbody>
-        </table>
-    </div>
+        <section class="order-grid" id="adminRows"></section>
+    </main>
 
     <script>
+        const statuses = [
+            'Order Placed',
+            'Photos Received',
+            'Designing',
+            'Preview Sent',
+            'Customer Approved',
+            'Printing',
+            'Packed',
+            'Shipped',
+            'Delivered'
+        ];
+
+        function normalizeCustomization(customization) {
+            if (Array.isArray(customization)) return customization[0] || {};
+            return customization || {};
+        }
+
+        function statusOptions(current) {
+            return statuses.map(status => `<option value="${status}" ${status === current ? 'selected' : ''}>${status}</option>`).join('');
+        }
+
+        function updateMetrics(orders) {
+            document.getElementById('metricTotal').innerText = orders.length;
+            document.getElementById('metricDesign').innerText = orders.filter(order => ['Photos Received', 'Designing', 'Preview Sent'].includes(order.status)).length;
+            document.getElementById('metricProduction').innerText = orders.filter(order => ['Customer Approved', 'Printing', 'Packed'].includes(order.status)).length;
+            document.getElementById('metricShipped').innerText = orders.filter(order => ['Shipped', 'Delivered'].includes(order.status)).length;
+        }
+
         window.onload = async function() {
             const token = localStorage.getItem('gt_token');
             const user = JSON.parse(localStorage.getItem('gt_user'));
 
-            // SECURITY: Kick out anyone who isn't the admin
             if (!user || !user.isAdmin) {
-                alert("Access Denied.");
+                alert('Access denied.');
                 window.location.href = 'index.html';
                 return;
             }
@@ -51,27 +117,61 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const orders = await res.json();
+            const rows = document.getElementById('adminRows');
 
-            const tbody = document.getElementById('admin-rows');
-            tbody.innerHTML = orders.map(order => `
-                <tr>
-                    <td>${order.userId ? order.userId.name : 'Guest'}</td>
-                    <td>${order.product}</td>
-                    <td>${order.address}</td>
-                    <td><span style="color:${order.status === 'Shipped' ? '#4CAF50' : '#d4a373'}">${order.status}</span></td>
-                    <td>
-                        <button class="ship-btn" onclick="markAsShipped('${order._id}')">MARK SHIPPED</button>
-                    </td>
-                </tr>
-            `).join('');
+            if (!Array.isArray(orders) || orders.length === 0) {
+                rows.innerHTML = '<div class="empty">No orders found.</div>';
+                updateMetrics([]);
+                return;
+            }
+
+            updateMetrics(orders);
+            rows.innerHTML = orders.map(order => {
+                const custom = normalizeCustomization(order.customization);
+                const customer = order.userId ? `${order.userId.name} (${order.userId.email})` : (order.customerName || 'Guest');
+                return `
+                    <article class="order-card">
+                        <div class="order-head">
+                            <div>
+                                <h2>${order.product}</h2>
+                                <p>${new Date(order.date).toLocaleString()} - ${order.amount || 0} INR</p>
+                            </div>
+                            <span class="badge">${order.status || 'Order Placed'}</span>
+                        </div>
+                        <div class="detail-grid">
+                            <div class="detail"><span>Customer</span><strong>${customer}</strong></div>
+                            <div class="detail"><span>WhatsApp</span><strong>${order.customerPhone || 'Not added'}</strong></div>
+                            <div class="detail"><span>Recipient</span><strong>${custom.recipientName || 'Not added'}</strong></div>
+                            <div class="detail"><span>Occasion</span><strong>${custom.occasion || 'Custom gift'}</strong></div>
+                            <div class="detail"><span>Photos</span><strong>${custom.photoCount || 0} preview upload(s)</strong></div>
+                            <div class="detail" style="grid-column: span 2;"><span>Headline</span><strong>${custom.coverLine || 'Not added'}</strong></div>
+                            <div class="detail" style="grid-column: span 3;"><span>Address</span><strong>${order.address || 'Not added'}</strong></div>
+                        </div>
+                        <div class="status-row">
+                            <select id="status-${order._id}">${statusOptions(order.status || 'Order Placed')}</select>
+                            <button onclick="updateStatus('${order._id}')">Update Status</button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         };
 
-        async function markAsShipped(id) {
+        async function updateStatus(id) {
             const token = localStorage.getItem('gt_token');
-            await fetch(`/api/admin/order/${id}/ship`, {
+            const status = document.getElementById(`status-${id}`).value;
+            const res = await fetch(`/api/admin/order/${id}/status`, {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
             });
+
+            if (!res.ok) {
+                alert('Status update failed.');
+                return;
+            }
             window.location.reload();
         }
     </script>
