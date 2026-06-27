@@ -11,32 +11,20 @@
         * { box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: #fff; margin: 0; padding: 42px 5vw; }
         a { color: var(--accent); text-decoration: none; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-        h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 58px); margin: 18px 0 8px; }
+        h1, h2 { font-family: 'Playfair Display', serif; margin: 0; }
+        h1 { font-size: clamp(36px, 5vw, 58px); margin: 18px 0 8px; }
+        h2 { font-size: 28px; }
         p { color: var(--muted); line-height: 1.7; }
-        .admin-shell { max-width: 1240px; margin: 0 auto; }
-        .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 28px 0; }
-        .metric, .order-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
-        .metric { padding: 18px; }
-        .metric span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
-        .metric strong { display: block; color: #fff; font-size: 30px; margin-top: 8px; }
-        .order-grid { display: grid; gap: 14px; }
-        .order-card { padding: 20px; }
-        .order-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
-        .order-head h2 { margin: 0; font-family: 'Playfair Display', serif; font-size: 26px; }
-        .badge { display: inline-flex; border-radius: 999px; padding: 7px 11px; background: #2d271f; color: var(--accent); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; white-space: nowrap; }
-        .detail-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
-        .detail { background: #13110f; border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 84px; }
-        .detail span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 6px; }
-        .detail strong { color: #fff; font-size: 13px; line-height: 1.45; word-break: break-word; }
-        .status-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        select {
+        input, textarea, select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
             background: #fffaf3;
             color: #111;
-            border: 0;
-            border-radius: 8px;
-            padding: 11px 12px;
-            min-width: 220px;
+            padding: 12px;
+            font: inherit;
         }
+        textarea { min-height: 110px; resize: vertical; }
         button {
             border: 0;
             border-radius: 999px;
@@ -46,15 +34,49 @@
             font-weight: 800;
             cursor: pointer;
         }
+        .admin-shell { max-width: 1240px; margin: 0 auto; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0; }
+        .tab-btn { background: #221d18; color: #fff; border: 1px solid var(--line); }
+        .tab-btn.active { background: var(--accent); color: #111; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0 0 28px; }
+        .metric, .order-card, .upload-card, .magazine-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+        .metric { padding: 18px; }
+        .metric span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+        .metric strong { display: block; color: #fff; font-size: 30px; margin-top: 8px; }
+        .order-grid, .magazine-grid { display: grid; gap: 14px; }
+        .order-card, .magazine-card, .upload-card { padding: 20px; }
+        .order-head, .magazine-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+        .order-head h2, .magazine-head h2 { font-size: 26px; }
+        .badge { display: inline-flex; border-radius: 999px; padding: 7px 11px; background: #2d271f; color: var(--accent); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; white-space: nowrap; }
+        .detail-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+        .detail { background: #13110f; border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 84px; }
+        .detail span, label { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 7px; }
+        .detail strong { color: #fff; font-size: 13px; line-height: 1.45; word-break: break-word; }
+        .status-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .upload-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 18px; align-items: start; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .field.full { grid-column: 1 / -1; }
+        .preview-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .preview-strip img, .cover-preview { width: 100%; height: 92px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #111; }
+        .cover-preview { height: 220px; margin-top: 10px; }
+        .magazine-card { display: grid; grid-template-columns: 130px 1fr; gap: 16px; }
+        .magazine-card img { width: 130px; height: 170px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
+        .magazine-card p { margin: 8px 0; }
+        .muted { color: var(--muted); }
         .empty { border: 1px dashed var(--line); border-radius: 8px; padding: 42px; text-align: center; color: var(--muted); }
         @media (max-width: 980px) {
             .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .detail-grid, .upload-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .upload-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 620px) {
             body { padding: 28px 4vw; }
-            .metrics, .detail-grid { grid-template-columns: 1fr; }
-            .order-head { flex-direction: column; }
+            .metrics, .detail-grid, .form-grid { grid-template-columns: 1fr; }
+            .order-head, .magazine-head { flex-direction: column; }
+            .magazine-card { grid-template-columns: 1fr; }
+            .magazine-card img { width: 100%; height: 220px; }
         }
     </style>
 </head>
@@ -62,16 +84,49 @@
     <main class="admin-shell">
         <a href="index.html">Back to Studio</a>
         <h1>Founder Control</h1>
-        <p>Manage custom magazine orders from photo intake to final delivery.</p>
+        <p>Manage customer orders and upload searchable magazine products for the public website.</p>
 
-        <section class="metrics">
-            <div class="metric"><span>Total Orders</span><strong id="metricTotal">0</strong></div>
-            <div class="metric"><span>In Design</span><strong id="metricDesign">0</strong></div>
-            <div class="metric"><span>Printing/Packed</span><strong id="metricProduction">0</strong></div>
-            <div class="metric"><span>Shipped</span><strong id="metricShipped">0</strong></div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('ordersTab', this)">Orders</button>
+            <button class="tab-btn" onclick="showTab('magazinesTab', this)">Magazine Uploads</button>
+        </div>
+
+        <section id="ordersTab" class="tab-panel active">
+            <section class="metrics">
+                <div class="metric"><span>Total Orders</span><strong id="metricTotal">0</strong></div>
+                <div class="metric"><span>In Design</span><strong id="metricDesign">0</strong></div>
+                <div class="metric"><span>Printing/Packed</span><strong id="metricProduction">0</strong></div>
+                <div class="metric"><span>Shipped</span><strong id="metricShipped">0</strong></div>
+            </section>
+            <section class="order-grid" id="adminRows"></section>
         </section>
 
-        <section class="order-grid" id="adminRows"></section>
+        <section id="magazinesTab" class="tab-panel">
+            <div class="upload-grid">
+                <form id="magazineForm" class="upload-card">
+                    <h2>Upload Magazine</h2>
+                    <p>These products appear in customer search and open with a 3D book preview.</p>
+                    <div class="form-grid">
+                        <div class="field"><label for="magName">Magazine name</label><input id="magName" required placeholder="The Birthday Cover"></div>
+                        <div class="field"><label for="magPrice">Price INR</label><input id="magPrice" type="number" required min="1" placeholder="1299"></div>
+                        <div class="field"><label for="magCategory">Category</label><input id="magCategory" placeholder="Birthday, Couple, Friends"></div>
+                        <div class="field"><label for="magRating">Rating</label><input id="magRating" type="number" min="1" max="5" step="0.1" value="5"></div>
+                        <div class="field full"><label for="magDescription">Description</label><textarea id="magDescription" required placeholder="Describe who this magazine is for and what it includes."></textarea></div>
+                        <div class="field full"><label for="magReview">Review highlight</label><textarea id="magReview" placeholder="Short customer-style review shown on the product detail page."></textarea></div>
+                        <div class="field full"><label for="coverFile">Cover image</label><input id="coverFile" type="file" accept="image/*" required><img id="coverPreview" class="cover-preview" alt=""></div>
+                        <div class="field full"><label for="pageFiles">Magazine page images</label><input id="pageFiles" type="file" accept="image/*" multiple><div id="pagePreviewStrip" class="preview-strip"></div></div>
+                    </div>
+                    <button type="submit" style="margin-top:16px;">Save Magazine</button>
+                    <p id="magazineMessage" class="muted"></p>
+                </form>
+
+                <section>
+                    <h2>Uploaded Catalog</h2>
+                    <p>Public search matches magazine name, category, description, and review text.</p>
+                    <div id="magazineRows" class="magazine-grid"></div>
+                </section>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -86,6 +141,15 @@
             'Shipped',
             'Delivered'
         ];
+        let coverData = '';
+        let pageData = [];
+
+        function showTab(panelId, button) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            button.classList.add('active');
+        }
 
         function normalizeCustomization(customization) {
             if (Array.isArray(customization)) return customization[0] || {};
@@ -103,16 +167,34 @@
             document.getElementById('metricShipped').innerText = orders.filter(order => ['Shipped', 'Delivered'].includes(order.status)).length;
         }
 
-        window.onload = async function() {
+        function requireFounder() {
             const token = localStorage.getItem('gt_token');
             const user = JSON.parse(localStorage.getItem('gt_user'));
-
-            if (!user || !user.isAdmin) {
-                alert('Access denied.');
+            if (!token || !user || !user.isAdmin) {
+                alert('Access denied. Founder email login is required.');
                 window.location.href = 'index.html';
-                return;
+                return null;
             }
+            return token;
+        }
 
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.onload = async function() {
+            const token = requireFounder();
+            if (!token) return;
+            await Promise.all([loadOrders(token), loadMagazines(token)]);
+            bindMagazineForm(token);
+        };
+
+        async function loadOrders(token) {
             const res = await fetch('/api/admin/all-orders', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -154,10 +236,95 @@
                     </article>
                 `;
             }).join('');
-        };
+        }
+
+        async function loadMagazines(token) {
+            const rows = document.getElementById('magazineRows');
+            rows.innerHTML = '<div class="empty">Loading magazine catalog...</div>';
+            const res = await fetch('/api/admin/magazines', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const magazines = await res.json();
+
+            if (!Array.isArray(magazines) || magazines.length === 0) {
+                rows.innerHTML = '<div class="empty">No uploaded magazines yet.</div>';
+                return;
+            }
+
+            rows.innerHTML = magazines.map(magazine => `
+                <article class="magazine-card">
+                    <img src="${magazine.coverImage || 'logo.jpeg'}" alt="${magazine.name}">
+                    <div>
+                        <div class="magazine-head">
+                            <h2>${magazine.name}</h2>
+                            <span class="badge">${magazine.category || 'Custom Gift'}</span>
+                        </div>
+                        <p>${magazine.description || ''}</p>
+                        <p><strong>${magazine.price || 0} INR</strong> - Rating ${magazine.rating || 5}/5</p>
+                        <p class="muted">${magazine.review || ''}</p>
+                        ${String(magazine._id || '').startsWith('seed-') ? '<span class="badge">Seed Product</span>' : `<button onclick="deleteMagazine('${magazine._id}')">Delete</button>`}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function bindMagazineForm(token) {
+            document.getElementById('coverFile').addEventListener('change', async event => {
+                const file = event.target.files[0];
+                coverData = file ? await readFileAsDataUrl(file) : '';
+                document.getElementById('coverPreview').src = coverData;
+            });
+
+            document.getElementById('pageFiles').addEventListener('change', async event => {
+                pageData = await Promise.all(Array.from(event.target.files).slice(0, 12).map(readFileAsDataUrl));
+                document.getElementById('pagePreviewStrip').innerHTML = pageData.map(src => `<img src="${src}" alt="Magazine page">`).join('');
+            });
+
+            document.getElementById('magazineForm').addEventListener('submit', async event => {
+                event.preventDefault();
+                const message = document.getElementById('magazineMessage');
+                message.innerText = 'Saving magazine...';
+
+                const payload = {
+                    name: document.getElementById('magName').value,
+                    description: document.getElementById('magDescription').value,
+                    price: Number(document.getElementById('magPrice').value),
+                    category: document.getElementById('magCategory').value,
+                    rating: Number(document.getElementById('magRating').value),
+                    review: document.getElementById('magReview').value,
+                    coverImage: coverData,
+                    pageImages: pageData,
+                    isPublished: true
+                };
+
+                const res = await fetch('/api/admin/magazines', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    message.innerText = data.error || 'Magazine save failed.';
+                    return;
+                }
+
+                event.target.reset();
+                coverData = '';
+                pageData = [];
+                document.getElementById('coverPreview').removeAttribute('src');
+                document.getElementById('pagePreviewStrip').innerHTML = '';
+                message.innerText = 'Magazine saved and published.';
+                await loadMagazines(token);
+            });
+        }
 
         async function updateStatus(id) {
-            const token = localStorage.getItem('gt_token');
+            const token = requireFounder();
+            if (!token) return;
             const status = document.getElementById(`status-${id}`).value;
             const res = await fetch(`/api/admin/order/${id}/status`, {
                 method: 'PUT',
@@ -172,7 +339,24 @@
                 alert('Status update failed.');
                 return;
             }
-            window.location.reload();
+            await loadOrders(token);
+        }
+
+        async function deleteMagazine(id) {
+            const token = requireFounder();
+            if (!token) return;
+            if (!confirm('Delete this uploaded magazine from the public catalog?')) return;
+
+            const res = await fetch(`/api/admin/magazines/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+                alert('Delete failed.');
+                return;
+            }
+            await loadMagazines(token);
         }
     </script>
 </body>

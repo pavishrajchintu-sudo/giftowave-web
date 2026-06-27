@@ -17,8 +17,10 @@ const razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
     })
     : null;
 
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 app.use(express.static('public'));
+app.use('/vendor/three', express.static('node_modules/three/build'));
 
 // --- Database Connection ---
 if (process.env.MONGO_URI) {
@@ -53,6 +55,56 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
+const magazineSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    price: { type: Number, required: true },
+    rating: { type: Number, default: 5 },
+    review: { type: String, default: "A premium personalized magazine gift." },
+    category: { type: String, default: "Custom Gift" },
+    coverImage: String,
+    pageImages: [String],
+    isPublished: { type: Boolean, default: true },
+    createdAt: { type: Date, default: Date.now }
+});
+const Magazine = mongoose.model('Magazine', magazineSchema);
+
+const seedMagazines = [
+    {
+        _id: 'seed-vogue',
+        name: 'The Vogue Edition',
+        description: 'A luxury editorial-style magazine for birthdays, creators, solo portraits, and statement gifts.',
+        price: 999,
+        rating: 4.9,
+        review: 'Customers love this for premium birthday surprises and polished portrait covers.',
+        category: 'Luxury Birthday',
+        coverImage: 'priyanka.jpeg',
+        pageImages: ['priyanka.jpeg', 'friends.jpeg', 'kylo.jpeg', 'logo.jpeg']
+    },
+    {
+        _id: 'seed-friends',
+        name: 'The F.R.I.E.N.D.S Issue',
+        description: 'A playful friendship magazine with group memories, inside jokes, farewell pages, and candid photos.',
+        price: 1299,
+        rating: 4.8,
+        review: 'Best for college groups, farewell gifts, and funny memory collections.',
+        category: 'Friendship',
+        coverImage: 'friends.jpeg',
+        pageImages: ['friends.jpeg', 'priyanka.jpeg', 'kylo.jpeg', 'logo.jpeg']
+    },
+    {
+        _id: 'seed-love',
+        name: 'The Love Story Issue',
+        description: 'A romantic keepsake magazine for anniversaries, proposals, long-distance couples, and relationship milestones.',
+        price: 1499,
+        rating: 5,
+        review: 'A strong pick when the gift needs to feel emotional and personal.',
+        category: 'Couple Gift',
+        coverImage: 'kylo.jpeg',
+        pageImages: ['kylo.jpeg', 'priyanka.jpeg', 'friends.jpeg', 'logo.jpeg']
+    }
+];
+
 const ORDER_STATUSES = [
     'Order Placed',
     'Photos Received',
@@ -64,6 +116,21 @@ const ORDER_STATUSES = [
     'Shipped',
     'Delivered'
 ];
+
+function isDbReady() {
+    return mongoose.connection.readyState === 1;
+}
+
+function matchesMagazineQuery(magazine, query) {
+    if (!query) return true;
+    const haystack = [
+        magazine.name,
+        magazine.description,
+        magazine.category,
+        magazine.review
+    ].join(' ').toLowerCase();
+    return haystack.includes(query.toLowerCase());
+}
 
 // --- Middleware: Auth Verification ---
 const authenticateToken = (req, res, next) => {
@@ -166,6 +233,50 @@ app.get('/api/user/orders', authenticateToken, async (req, res) => {
     }
 });
 
+// --- PUBLIC MAGAZINE CATALOG ROUTES ---
+
+app.get('/api/magazines', async (req, res) => {
+    const query = (req.query.q || '').toString().trim();
+
+    try {
+        if (!isDbReady()) {
+            return res.json(seedMagazines.filter(magazine => matchesMagazineQuery(magazine, query)));
+        }
+
+        const filter = { isPublished: true };
+        if (query) {
+            filter.$or = [
+                { name: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } },
+                { category: { $regex: query, $options: 'i' } },
+                { review: { $regex: query, $options: 'i' } }
+            ];
+        }
+
+        const magazines = await Magazine.find(filter).sort({ createdAt: -1 });
+        const combined = magazines.length ? magazines : seedMagazines.filter(magazine => matchesMagazineQuery(magazine, query));
+        res.json(combined);
+    } catch (err) {
+        console.error("Magazine search failed:", err.message);
+        res.json(seedMagazines.filter(magazine => matchesMagazineQuery(magazine, query)));
+    }
+});
+
+app.get('/api/magazines/:id', async (req, res) => {
+    try {
+        const seedMagazine = seedMagazines.find(magazine => magazine._id === req.params.id);
+        if (seedMagazine) return res.json(seedMagazine);
+
+        if (!isDbReady()) return res.status(503).json({ error: "Magazine database is not configured" });
+
+        const magazine = await Magazine.findOne({ _id: req.params.id, isPublished: true });
+        if (!magazine) return res.status(404).json({ error: "Magazine not found" });
+        res.json(magazine);
+    } catch (err) {
+        res.status(404).json({ error: "Magazine not found" });
+    }
+});
+
 // --- ADMIN ROUTES (Founder Dashboard) ---
 
 app.get('/api/admin/all-orders', authenticateToken, async (req, res) => {
@@ -212,6 +323,71 @@ app.put('/api/admin/order/:id/status', authenticateToken, async (req, res) => {
         res.json({ success: true, order: updated });
     } catch (err) {
         res.status(400).json({ error: "Status update failed" });
+    }
+});
+
+app.get('/api/admin/magazines', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+    if (!isDbReady()) return res.json(seedMagazines);
+
+    try {
+        const magazines = await Magazine.find().sort({ createdAt: -1 });
+        res.json(magazines);
+    } catch (err) {
+        res.status(500).json({ error: "Magazine list failed" });
+    }
+});
+
+app.post('/api/admin/magazines', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+    if (!isDbReady()) return res.status(503).json({ error: "MongoDB is required to save founder uploads" });
+
+    const {
+        name,
+        description,
+        price,
+        rating,
+        review,
+        category,
+        coverImage,
+        pageImages,
+        isPublished
+    } = req.body;
+
+    if (!name || !description || !price || !coverImage) {
+        return res.status(400).json({ error: "Name, description, price, and cover image are required" });
+    }
+
+    try {
+        const magazine = new Magazine({
+            name: name.trim(),
+            description: description.trim(),
+            price: Number(price),
+            rating: Math.min(Math.max(Number(rating) || 5, 1), 5),
+            review: (review || '').trim(),
+            category: (category || 'Custom Gift').trim(),
+            coverImage,
+            pageImages: Array.isArray(pageImages) ? pageImages.slice(0, 12) : [],
+            isPublished: isPublished !== false
+        });
+        await magazine.save();
+        res.status(201).json({ success: true, magazine });
+    } catch (err) {
+        console.error("Magazine save failed:", err.message);
+        res.status(400).json({ error: "Failed to save magazine" });
+    }
+});
+
+app.delete('/api/admin/magazines/:id', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) return res.status(403).json({ error: "Founder access only" });
+    if (!isDbReady()) return res.status(503).json({ error: "MongoDB is required to delete uploads" });
+
+    try {
+        const deleted = await Magazine.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ error: "Magazine not found" });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(400).json({ error: "Delete failed" });
     }
 });
 
